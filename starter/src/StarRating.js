@@ -1,6 +1,8 @@
 import { useState } from "react";
 
-// Dobavqne na zvezdi - kak da sa ocveteni i neocveteni.
+// pravim taka, che zvezdite da se ocvetqvat, kato hover-nem vyrhu tqh. Kato minem s mishkata vyrhu nqkoq
+// neocvetena - syshto se ocvetqva. tempRating e za vremenno ocvetenata (t.e. dokato sme s kursora v/u neq).
+// rating e kato e veche ocvetena.
 const containerStyle = {
   display: "flex",
   alignItems: "center",
@@ -17,7 +19,8 @@ const textStyle = {
 };
 
 export default function StarRating({ maxRating = 5 }) {
-  const [rating, setRating] = useState(1);
+  const [rating, setRating] = useState(0);
+  const [tempRating, setTempRating] = useState(0);
 
   function handleRating(rating) {
     setRating(rating);
@@ -29,12 +32,14 @@ export default function StarRating({ maxRating = 5 }) {
         {Array.from({ length: maxRating }, (_, i) => (
           <Star
             key={i}
+            full={tempRating ? tempRating >= i + 1 : rating >= i + 1}
             onRate={() => handleRating(i + 1)}
-            full={rating >= i + 1}
+            onHoverIn={() => setTempRating(i + 1)}
+            onHoverOut={() => setTempRating(0)}
           />
         ))}
       </div>
-      <p style={textStyle}>{rating || ""}</p>
+      <p style={textStyle}>{tempRating || rating || ""}</p>
     </div>
   );
 }
@@ -46,12 +51,15 @@ const starStyle = {
   cursor: "pointer",
 };
 
-/* podadohme onRate ot gore. And this is basically what we have been doing all the time, which is to pass event
-handler function from the component that owns the state, right into a component that wants to actually update
-the state!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-function Star({ onRate, full }) {
+function Star({ onRate, full, onHoverIn, onHoverOut }) {
   return (
-    <span role="button" style={starStyle} onClick={onRate}>
+    <span
+      role="button"
+      style={starStyle}
+      onClick={onRate}
+      onMouseEnter={onHoverIn}
+      onMouseLeave={onHoverOut}
+    >
       {full ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
