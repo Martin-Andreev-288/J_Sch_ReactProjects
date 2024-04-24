@@ -49,8 +49,14 @@ const tempWatchedData = [
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
-// syzdadohme reusable box component. Preimehuvahme WatchedBox na box i go premestihme v App, kato slozhihme
-// dva komponenta v nego i si se renderira po syshtiq nachin. Preimenuvahme i ListBox na Box.
+
+// !!!TOVA E SAMO ZA POKAZVANE, SLED TAZI PROMQNA SHTE GO VYRNEM VEDNAGA, KAKTO SI BESHE!!!!!!!!!!!!
+// Podavame elementi kato <Box i tuk elementite />, vmesto <Box>tuk elementite</Box>
+// HUBAV PRIMER I ZA RAZLIKATA NA TOVA DA PODAVASH PO TOZI NACHIN
+// So this can be a viable pattern in case you need to pass in multiple elements and give them separate names.
+// So that would be a perfectly fine use case for using something like an element prop or really any other
+// prop with any other name instead of the implicit children prop.
+// ...BUT USING CHILDREN IS BY FAR THE PREFERRED WAY OF DOING THIS.
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
@@ -62,14 +68,21 @@ export default function App() {
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        <Box>
+        <Box element={<MovieList movies={movies} />} />
+        <Box element={<>
+          <WatchedSummary watched={watched} />
+          <WatchedMoviesList watched={watched} />
+        </>
+        }
+        />
+        {/* <Box>
           <MovieList movies={movies} />
         </Box>
 
         <Box>
           <WatchedSummary watched={watched} />
           <WatchedMoviesList watched={watched} />
-        </Box>
+        </Box> */}
       </Main>
     </>
   );
@@ -124,31 +137,8 @@ function Main({ children }) {
     </main>
   );
 }
-/*
-function WatchedBox() {
-  const [watched, setWatched] = useState(tempWatchedData);
-  const [isOpen2, setIsOpen2] = useState(true);
 
-  return (
-    <div className="box">
-      <button
-        className="btn-toggle"
-        onClick={() => setIsOpen2((open) => !open)}
-      >
-        {isOpen2 ? "–" : "+"}
-      </button>
-      {isOpen2 && (
-        <>
-          <WatchedSummary watched={watched} />
-          <WatchedMoviesList watched={watched} />
-        </>
-      )}
-    </div>
-  );
-}
-*/
-// preimenuvahme ListBox na Box i mahnahme edinicite (veche ne sa v edin cql komponent s WatchedBox)
-function Box({ children }) {
+function Box({ element }) {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -159,7 +149,7 @@ function Box({ children }) {
       >
         {isOpen ? "–" : "+"}
       </button>
-      {isOpen && children}
+      {isOpen && element}
     </div>
   );
 }
