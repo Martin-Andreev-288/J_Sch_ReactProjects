@@ -50,26 +50,32 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-/* tuk pravim taka, che v gorniq desen ygyl da izpisva "Found 3 results". Za celta izpolzvame lift state, vdigame state-a s
-tempMovieData do App i passvame movies na nqkolko mesta, no taka se poluchava prop drilling. Problem, koyto shte se opitvame
-da razreshim v sledvashtiq fayl */
+// imahme 2 prop drilling-a. Ediniqt beshe samo na 1 nivo (s navbar-a), no drugiq - na poveche - App, main,
+// ListBox
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
-
+  /* v navbar pravim kompoziciq. Sled tova mahame i Logo ot tuk i go slagame dolu v NavBar */
   return (
     <>
-      <NavBar movies={movies} />
-      <Main movies={movies} />
+      <NavBar movies={movies}>
+        <Search />
+        <NumResults movies={movies} />
+      </NavBar>
+      <Main>
+        <ListBox>
+          <MovieList movies={movies} />
+        </ListBox>
+        <WatchedBox />
+      </Main>
     </>
   );
 }
-
-function NavBar({ movies }) {
+/* v navbar pravim kompoziciq.. Premahvame i movies={movies} i ot navbar v app(), kydeto go podavahme nadolu */
+function NavBar({ children }) {
   return (
     <nav className="nav-bar">
       <Logo />
-      <Search />
-      <NumResults movies={movies} />
+      {children}
     </nav>
   );
 }
@@ -105,18 +111,17 @@ function NumResults({ movies }) {
     </p>
   );
 }
-
-function Main({ movies }) {
+// tuk veche e children vmesto movies. I dolu syshto podavame samo {children}. I posle promenqme Main-a v App.js
+function Main({ children }) {
 
   return (
     <main className="main">
-      <ListBox movies={movies} />
-      <WatchedBox />
+      {children}
     </main>
   );
 }
 
-function ListBox({ movies }) {
+function ListBox({ children }) {
   const [isOpen1, setIsOpen1] = useState(true);
 
   return (
@@ -127,9 +132,7 @@ function ListBox({ movies }) {
       >
         {isOpen1 ? "–" : "+"}
       </button>
-      {isOpen1 && (
-        <MovieList movies={movies} />
-      )}
+      {isOpen1 && children}
     </div>
   );
 }
