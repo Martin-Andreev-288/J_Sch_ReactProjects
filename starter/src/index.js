@@ -8,10 +8,7 @@ import StarRating from './StarRating';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    {/*Pravim tova, za da ne syzdavame nov proekt samo zaradi StarRating-a*/}
     {/* <App /> */}
     <StarRating maxRating={5} />
-    <StarRating maxRating={10} />
-    <StarRating />
   </React.StrictMode>
 );
