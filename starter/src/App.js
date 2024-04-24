@@ -50,22 +50,26 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-
+/* tuk pravim taka, che v gorniq desen ygyl da izpisva "Found 3 results". Za celta izpolzvame lift state, vdigame state-a s
+tempMovieData do App i passvame movies na nqkolko mesta, no taka se poluchava prop drilling. Problem, koyto shte se opitvame
+da razreshim v sledvashtiq fayl */
 export default function App() {
+  const [movies, setMovies] = useState(tempMovieData);
+
   return (
     <>
-      <NavBar />
-      <Main />
+      <NavBar movies={movies} />
+      <Main movies={movies} />
     </>
   );
 }
 
-function NavBar() {
+function NavBar({ movies }) {
   return (
     <nav className="nav-bar">
       <Logo />
       <Search />
-      <NumResults />
+      <NumResults movies={movies} />
     </nav>
   );
 }
@@ -93,26 +97,26 @@ function Search() {
   );
 }
 
-function NumResults() {
+function NumResults({ movies }) {
 
   return (
     <p className="num-results">
-      Found <strong>X</strong> results
+      Found <strong> {movies.length} </strong> results
     </p>
   );
 }
 
-function Main() {
+function Main({ movies }) {
 
   return (
     <main className="main">
-      <ListBox />
+      <ListBox movies={movies} />
       <WatchedBox />
     </main>
   );
 }
 
-function ListBox() {
+function ListBox({ movies }) {
   const [isOpen1, setIsOpen1] = useState(true);
 
   return (
@@ -124,15 +128,13 @@ function ListBox() {
         {isOpen1 ? "–" : "+"}
       </button>
       {isOpen1 && (
-        <MovieList />
+        <MovieList movies={movies} />
       )}
     </div>
   );
 }
 
-function MovieList() {
-  const [movies, setMovies] = useState(tempMovieData);
-
+function MovieList({ movies }) {
   return (
     <ul className="list">
       {movies?.map((movie) => (
