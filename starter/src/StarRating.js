@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const containerStyle = {
   display: "flex",
@@ -10,14 +11,22 @@ const starContainerSyle = {
   display: "flex",
 };
 
-// slagame defaultRating, koyto e syzdaden i v index.js. Negovata cel e da pokazva rayting-a, ako user-a veche
-// e glasuval, ili prosto da pokazva nqkakyv reyting, koyto sme zadali v skobite mu v index.js
-// za defaultRating-a: Maybe you heard or read that we should never initialize state from props. However, this
-// is only true if you want the state variable to stay in sync with that passed in props, or in other words,
-// if you want the state value to update in case that the prop value is also updated. However, that is clearly
-// not the case here. So, we are really only using this defaultRating here basically as seed data, so really
-// just as the initial state, and we don't care whether this value here may changes somewhere else in the app,
-// so outside this component.
+// ppc Jonas ne polzva typescript, zashtoto v dneshno vreme developer-ite ne go praveli.
+// no ako neshta ot tozi sort sa ni vazhni, mozhem da izpolzvame typescript.
+// inache sega ako podadem neshto razlichno ot chislo za maxRating, shte ni izskochi greshka
+// ako napishem .isRequired, prop-a shte e zadylzhitelen. No tuk nqma smisyl: in our case we actually have
+// some default values for all of our props already defined. And so it doesn't mmake sense then to mark any
+// of them as required.
+StarRating.propTypes = {
+  maxRating: PropTypes.number,
+  defaultRating: PropTypes.number,
+  color: PropTypes.string,
+  size: PropTypes.number,
+  messages: PropTypes.array,
+  className: PropTypes.string,
+  onSetRating: PropTypes.func,
+};
+// imame i .bool za boolean i .obj za obekt
 export default function StarRating({
   maxRating = 5,
   color = "#fcc419",
@@ -32,20 +41,16 @@ export default function StarRating({
 
   function handleRating(rating) {
     setRating(rating);
-    onSetRating(rating); // tuk veche setvame i external rating-a, ne samo internal-a
+    onSetRating(rating);
   }
 
-  /* textyle shte zavisi ot props-vete, taka che go mestim tuk */
   const textStyle = {
     lineHeight: "1",
     margin: "0",
     color,
     fontSize: `${size / 1.5}px`,
   };
-  // pravim taka, che da se pokazva nqkakva duma za ocenkata. Malko obyrkvashto, no vsyshtnost prosto normalen
-  // javascript. Tova se sluchva ot {messages.length ... natatyk. Tova e prosto s cel ako nqkoy dobavi razlichen
-  // broy na ocenkite s dumi v index.js ot maksimalnata ocenka (t.e. v sluchaq maksimalnata ocenka e 5, znachi i
-  // dumite za ocenka tr da sa 5) - tova da dade cifra, vmesto duma (t.e. shte dade 1, 2, 3, 4, 5, vmesto duma).
+
   return (
     <div style={containerStyle} className={className}>
       <div style={starContainerSyle}>
@@ -70,8 +75,6 @@ export default function StarRating({
   );
 }
 
-/* starStyle syshto shte sa zavisimi ot props-ovete, zatova i tqh gi mestim
-promenqme cvetovete i dolu v JSX-a */
 function Star({ onRate, full, onHoverIn, onHoverOut, color, size }) {
   const starStyle = {
     width: `${size}px`,
