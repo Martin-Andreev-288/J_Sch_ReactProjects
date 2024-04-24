@@ -49,12 +49,12 @@ const tempWatchedData = [
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
-
-// imahme 2 prop drilling-a. Ediniqt beshe samo na 1 nivo (s navbar-a), no drugiq - na poveche - App, main,
-// ListBox
+// syzdadohme reusable box component. Preimehuvahme WatchedBox na box i go premestihme v App, kato slozhihme
+// dva komponenta v nego i si se renderira po syshtiq nachin. Preimenuvahme i ListBox na Box.
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
-  /* v navbar pravim kompoziciq. Sled tova mahame i Logo ot tuk i go slagame dolu v NavBar */
+  const [watched, setWatched] = useState(tempWatchedData);
+
   return (
     <>
       <NavBar movies={movies}>
@@ -62,15 +62,19 @@ export default function App() {
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        <ListBox>
+        <Box>
           <MovieList movies={movies} />
-        </ListBox>
-        <WatchedBox />
+        </Box>
+
+        <Box>
+          <WatchedSummary watched={watched} />
+          <WatchedMoviesList watched={watched} />
+        </Box>
       </Main>
     </>
   );
 }
-/* v navbar pravim kompoziciq.. Premahvame i movies={movies} i ot navbar v app(), kydeto go podavahme nadolu */
+
 function NavBar({ children }) {
   return (
     <nav className="nav-bar">
@@ -111,7 +115,7 @@ function NumResults({ movies }) {
     </p>
   );
 }
-// tuk veche e children vmesto movies. I dolu syshto podavame samo {children}. I posle promenqme Main-a v App.js
+
 function Main({ children }) {
 
   return (
@@ -120,19 +124,42 @@ function Main({ children }) {
     </main>
   );
 }
-
-function ListBox({ children }) {
-  const [isOpen1, setIsOpen1] = useState(true);
+/*
+function WatchedBox() {
+  const [watched, setWatched] = useState(tempWatchedData);
+  const [isOpen2, setIsOpen2] = useState(true);
 
   return (
     <div className="box">
       <button
         className="btn-toggle"
-        onClick={() => setIsOpen1((open) => !open)}
+        onClick={() => setIsOpen2((open) => !open)}
       >
-        {isOpen1 ? "–" : "+"}
+        {isOpen2 ? "–" : "+"}
       </button>
-      {isOpen1 && children}
+      {isOpen2 && (
+        <>
+          <WatchedSummary watched={watched} />
+          <WatchedMoviesList watched={watched} />
+        </>
+      )}
+    </div>
+  );
+}
+*/
+// preimenuvahme ListBox na Box i mahnahme edinicite (veche ne sa v edin cql komponent s WatchedBox)
+function Box({ children }) {
+  const [isOpen, setIsOpen] = useState(true);
+
+  return (
+    <div className="box">
+      <button
+        className="btn-toggle"
+        onClick={() => setIsOpen((open) => !open)}
+      >
+        {isOpen ? "–" : "+"}
+      </button>
+      {isOpen && children}
     </div>
   );
 }
@@ -160,28 +187,6 @@ function Movie({ movie }) {
         </p>
       </div>
     </li>
-  );
-}
-
-function WatchedBox() {
-  const [watched, setWatched] = useState(tempWatchedData);
-  const [isOpen2, setIsOpen2] = useState(true);
-
-  return (
-    <div className="box">
-      <button
-        className="btn-toggle"
-        onClick={() => setIsOpen2((open) => !open)}
-      >
-        {isOpen2 ? "–" : "+"}
-      </button>
-      {isOpen2 && (
-        <>
-          <WatchedSummary watched={watched} />
-          <WatchedMoviesList watched={watched} />
-        </>
-      )}
-    </div>
   );
 }
 
