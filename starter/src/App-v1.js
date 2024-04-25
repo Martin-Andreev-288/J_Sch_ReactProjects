@@ -52,9 +52,8 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* Poluchavat se tvyrde mnogo zaqvki, imame i race condition. Tova popravqme tuk.
-Poluchava se i drug problem, za koyto zabravih kak da obqsnq, v nachaloto na 156-ta lekciq e.
-Mozhe da se vidi v browser-a v network i Fetch/XHR - zaqvkite sa mnogo */
+/* Pravim taka, che da mozhem da zatvarqme filma i s escape. Za tazi cel se nalozhi da izlezem ot reakt i da
+se vyrnem kym DOM (t.e. s addEventListener) */
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -327,6 +326,32 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onAddWatched(newWatchedMovie);
     onCloseMovie();
   }
+
+  /* tozi dolen useEffect tr da e tuk, zashtoto ako e s gornite, shte ni izpisva "CLOSING" v konzolata dori i
+  veche da sme zatvorili filma i da ne sme v nego
+  !!! Each time that this effect here is executed, it'll basically add one more event listener to the document.
+  And so if we open up 10 movies and then close them all, we will end up with 10 of the same event listeners
+  attached to the document which of course, is not what we want. Po tazi prichina nay-dolu dobavqne cleanup
+  funkciq (callback)
+   */
+  useEffect(
+    function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          onCloseMovie();
+          console.log("CLOSING");
+        }
+      }
+
+      document.addEventListener("keydown", callback);
+
+      // callback funkciq
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMovie]
+  );
 
   console.log(title, year); // purvonachalno printi undefined undefined, sled tova veche si printi zaglavieto
   // i godinata. Tova e zaradi procesa s await/useEffect () - pyrvonachalno e prazen obekt gore, posle
