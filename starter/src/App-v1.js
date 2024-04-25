@@ -52,9 +52,9 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* dobavqne na veche gledani filmi/da mozhe da se glasuva/da se zatvarqt vednaga, sled kato glasuvame/da ne
-mozhe da dobavqme 2 pyti nqkoy veche dobaven/da izliza buton + Add to List, ako veche sme glasuvali (zashtoto
-togava veche se broi za gledan), da mozhem da triem film ot list */
+/* Pravim taka, che da se poqvqva zaglavieto v bar-a (v linka). Samo che taka ima problem, a toy e che ostava
+syshtoto, kato zatvorim filma. Tozi problem shte reshim v sledvashtata lekciq - zatova shte ni tr cleanup v
+useEffect-a */
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -333,6 +333,19 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
       getMovieDetails();
     },
     [selectedId]
+  );
+
+  useEffect(
+    //!! Taka se poluchava problem. Ako se vyrnem, prodylzava da stoi syshtoto zaglavie. Tova popravqme v
+    // sledvashtata lekciq
+    function () {
+      if (!title) return;
+      // tova if e za da ne izpisva undefined v nachaloto, kakto se poluchava bez nego syvsem zamalko
+      document.title = `Movie | ${title}`;
+    },
+    [title]
+    /* tuk ako nqma title, a prazen array, shte izpisva undefined, ponezhe v nachaloto obektyt e prazen
+    (po-podrobno obqsneno vyv videoto nqkyde v 4-tata/5-tata minuta) */
   );
 
   // tova &larr; dolu e strelka nalqvo. S neq vryshtame nazad v sluchaq (ili zatvarqme otvoreniq film)
