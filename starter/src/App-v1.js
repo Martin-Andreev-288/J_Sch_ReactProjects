@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import StarRating from "./StarRating";
 
 const tempMovieData = [
   {
@@ -51,8 +52,7 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* pravim taka, che da mozhe da ni se poqvqva info za movie-to, kato go izberem (zasega se poqvqva samo ID-to)
-syzdavame i buton za zatvarqne, sled kato sme go izbrali */
+/* dobavqne na rating-a, koyto pravehme, dobavqne na vtori useEffect */
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -79,7 +79,6 @@ export default function App() {
   console.log("During render");
   */
 
-  // s tazi f-q izbirame movie i zasega mu pokazva ID-to. Ako pak cyknem vyrhu nego - se zatvarq.
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
   }
@@ -254,13 +253,88 @@ function Movie({ movie, onSelectMovie }) {
 }
 
 function MovieDetails({ selectedId, onCloseMovie }) {
+  // kopirame fetch-a otgore i podmenqme chast ot linka. GLEDAME v sayta!!! obdbapi.com. Ot tam se orientirame
+  // che tr da ima i sled KEY i predi selectedId. Ima edin ogromen paragraf Parameters.
+
+  // tuk ponezhe filmite sa v obekt, nachalniq state shte e obekt (ako napishem const data = await res.json();
+  // i sled tova console.log(data) i getMovieDetails() (vizh v screenshot-a kyde tochno) - shte vidim)
+  const [movie, setMovie] = useState({});
+  // za da imame loading indikator, dokato se zarezhda izbraniq film (za razlika ot predniq pyt, tuk ne
+  // napisahme tova za greshka s interneta i t.n.):
+  const [isLoading, setIsLoading] = useState(false);
+
+  // destrukturirame ot tozi obekt, ponezhe jonas ne haresva key-ovete da zapochvat s glavna bukva:
+  const {
+    Title: title,
+    Year: year,
+    Poster: poster,
+    Runtime: runtime,
+    imdbRating,
+    Plot: plot,
+    Released: released,
+    Actors: actors,
+    Director: director,
+    Genre: genre,
+  } = movie;
+
+  console.log(title, year); // purvonachalno printi undefined undefined, sled tova veche si printi zaglavieto
+  // i godinata. Tova e zaradi procesa s await/useEffect () - pyrvonachalno e prazen obekt gore, posle
+  // setMovie(data); go pylni. Vyv videoto e nqkyde sled 5-tata minuta
+  // ako NQMA selectedId dolu v dependency array-a, nqma da se smenq izbraniq film (shte si stoi syshtiq)
+  // hubavo obqsnenie za tova nqkyde sled 12-tata minuta
+  useEffect(
+    function () {
+      async function getMovieDetails() {
+        setIsLoading(true);
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
+        );
+        const data = await res.json();
+        setMovie(data);
+        setIsLoading(false);
+      }
+      getMovieDetails();
+    },
+    [selectedId]
+  );
+
   // tova &larr; dolu e strelka nalqvo. S neq vryshtame nazad v sluchaq (ili zatvarqme otvoreniq film)
   return (
     <div className="details">
-      <button className="btn-back" onClick={onCloseMovie}>
-        &larr;
-      </button>
-      {selectedId}
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <header>
+            <button className="btn-back" onClick={onCloseMovie}>
+              &larr;
+            </button>
+            <img src={poster} alt={`Poster of ${movie} movie`} />
+            <div className="details-overview">
+              <h2>{title}</h2>
+              <p>
+                {released} &bull; {runtime}
+              </p>
+              <p>{genre}</p>
+              <p>
+                <span>⭐</span>
+                {imdbRating} IMDb rating
+              </p>
+            </div>
+          </header>
+
+          <section>
+            <div className="rating">
+              <StarRating maxRating={10} size={24} />
+            </div>
+            <p>
+              <em>{plot}</em>
+            </p>
+            <p>Starring {actors}</p>
+            <p>Directed by {director}</p>
+          </section>
+        </>
+      )}
     </div>
   );
 }
