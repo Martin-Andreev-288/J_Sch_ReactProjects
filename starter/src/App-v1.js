@@ -51,58 +51,82 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-// kakvo da se sluchi, ako internet vryzkata na potrebitelq prekysne, dokato razglezhda stranicata ni
-// SYSHTO i kakvo da napravim, ako imame greshno query
+// MNOGO VAZHNA LEKCIQ, SPORED LEKTORA
+//!!!! implementirame da ne pokazva, che nqma nameren film, kato v searchbar-a nqma pone 3 bukvi. Pravim i
+// razlichni experimenti
 export default function App() {
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  // const query = "interstellar";
-  const query = "sdefsasf";
+  const tempQuery = "interstellar";
+
+  /*
+  useEffect(function () {
+    console.log("After initial render");
+  }, []);
 
   useEffect(function () {
-    async function fetchMovies() {
-      try {
-        setIsLoading(true);
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-        );
+    console.log("After every render");
+  });
 
-        if (!res.ok)
-          throw new Error("Something went wrong with fetching movies");
+  useEffect(
+    function () {
+      console.log("D");
+    },
+    [query]
+  );
+  console.log("During render");
+  */
 
-        const data = await res.json();
-        if (data.Reponse === "False") throw new Error("Movie not found");
+  useEffect(
+    function () {
+      async function fetchMovies() {
+        try {
+          setIsLoading(true);
+          setError(""); // tr da resetnem error state-a. Sled kato dolu se poluchi greshka, ako ne go resetnem
+          // tuk, nqma da se poluchi otnovo
+          const res = await fetch(
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+          );
 
-        setMovies(data.Search);
-        console.log(data); // taka vryshta {Response: 'False', Error: 'Movie not found!'}
-        // taka che izpolzvame tova syobshtenie v gorniq if, za da vyrnem greshka "Movie not found", ako
-        // tova se sluchi (t.e. ako query-to e greshno)
-        // samo che pri men ne se poluchava tochno, zashtoto stava greshka, kato ne mozhe da prochete length
-        // na nqkoi neshta, koito po tozi nachin stavat undefined. I grymva vsichko. No vse pak go pushvam taka.
-      } catch (err) {
-        console.log(err.message);
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-        // premestvame go taka, zashtoto inache se poqvqva i zaedno sys syobshtenieto za fayl, kogato internetyt
-        // spre i stoqt i dvete zaedno.
-        // no vizh kak da go izprobvash vyv videoto, che e malko trudno za obqsnenie
+          if (!res.ok)
+            throw new Error("Something went wrong with fetching movies");
+
+          const data = await res.json();
+          console.log(data);
+          // !!!!!!! TOVA TUK e Response, ne reponse!!!!!!! V predishnata versiq e napisano greshno.
+          if (data.Response === "False") throw new Error("Movie not found");
+
+          setMovies(data.Search);
+        } catch (err) {
+          console.log(err.message);
+          setError(err.message);
+        } finally {
+          setIsLoading(false);
+        }
       }
-    }
-    fetchMovies();
-  }, []);
+      // taka veche ne pokazva nishto, ako nqma pone 3 vyvedeni bukvi v searchbar-a
+      if (query.length < 3) {
+        setMovies([]);
+        setError("");
+        return;
+      }
+
+      fetchMovies();
+    },
+    [query]
+  );
 
   return (
     <>
       <NavBar movies={movies}>
-        <Search />
+        <Search query={query} setQuery={setQuery} />
         <NumResults movies={movies} />
       </NavBar>
       <Main>
         <Box>
-          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
           {isLoading && <Loader />}
           {!isLoading && !error && <MovieList movies={movies} />}
           {error && <ErrorMessage message={error} />}
@@ -146,9 +170,7 @@ function Logo() {
   );
 }
 
-function Search() {
-  const [query, setQuery] = useState("");
-
+function Search({ query, setQuery }) {
   return (
     <input
       className="search"
