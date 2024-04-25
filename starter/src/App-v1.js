@@ -51,24 +51,46 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-// syzdavame loader, koyto se pokazva, dokato stranicata se zarezhda
+// kakvo da se sluchi, ako internet vryzkata na potrebitelq prekysne, dokato razglezhda stranicata ni
+// SYSHTO i kakvo da napravim, ako imame greshno query
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const query = "interstellar";
+  const [error, setError] = useState("");
+  // const query = "interstellar";
+  const query = "sdefsasf";
 
   useEffect(function () {
     async function fetchMovies() {
-      setIsLoading(true);
-      const res = await fetch(
-        `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-      );
-      const data = await res.json();
-      setMovies(data.Search);
-      setIsLoading(false);
-    }
+      try {
+        setIsLoading(true);
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+        );
 
+        if (!res.ok)
+          throw new Error("Something went wrong with fetching movies");
+
+        const data = await res.json();
+        if (data.Reponse === "False") throw new Error("Movie not found");
+
+        setMovies(data.Search);
+        console.log(data); // taka vryshta {Response: 'False', Error: 'Movie not found!'}
+        // taka che izpolzvame tova syobshtenie v gorniq if, za da vyrnem greshka "Movie not found", ako
+        // tova se sluchi (t.e. ako query-to e greshno)
+        // samo che pri men ne se poluchava tochno, zashtoto stava greshka, kato ne mozhe da prochete length
+        // na nqkoi neshta, koito po tozi nachin stavat undefined. I grymva vsichko. No vse pak go pushvam taka.
+      } catch (err) {
+        console.log(err.message);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+        // premestvame go taka, zashtoto inache se poqvqva i zaedno sys syobshtenieto za fayl, kogato internetyt
+        // spre i stoqt i dvete zaedno.
+        // no vizh kak da go izprobvash vyv videoto, che e malko trudno za obqsnenie
+      }
+    }
     fetchMovies();
   }, []);
 
@@ -79,8 +101,12 @@ export default function App() {
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        <Box>{isLoading ? <Loader /> : <MovieList movies={movies} />}</Box>
-
+        <Box>
+          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
+          {isLoading && <Loader />}
+          {!isLoading && !error && <MovieList movies={movies} />}
+          {error && <ErrorMessage message={error} />}
+        </Box>
         <Box>
           <WatchedSummary watched={watched} />
           <WatchedMoviesList watched={watched} />
@@ -92,6 +118,14 @@ export default function App() {
 
 function Loader() {
   return <p className="loader">Loading...</p>;
+}
+
+function ErrorMessage({ message }) {
+  return (
+    <p className="error">
+      <span>⛔</span> {message}
+    </p>
+  );
 }
 
 function NavBar({ children }) {
