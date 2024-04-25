@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const tempMovieData = [
   {
@@ -50,19 +50,18 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-const KEY = "95b5ad09"; // When you're just defining a variable like this that doesn't depend on anything that's inside
-// the component, then just declare it outside (like now).
+const KEY = "95b5ad09";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
-  // primer kak NE TRQBVA da fetchvame danni v reakt:
-  // fetch(`http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=interstellar`)
-  //   .then((res) => res.json())
-  //   .then((data) => setMovies(data.Search));
-  // ako e samo za console.log, ne e problem, no ako e zamesen i state - e problem, zashtoto ima side effekt.
-  // Ako otvorim network, shte vidim, che ima infinite number of requests, so it keeps goingand it never really
-  // stops. I ima fetch zaqvki vsqka sekunda. Stava infinite loop.
+
+  useEffect(function () {
+    fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`)
+      .then((res) => res.json())
+      .then((data) => setMovies(data.Search));
+  }, []);
+
   return (
     <>
       <NavBar movies={movies}>
