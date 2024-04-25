@@ -52,7 +52,9 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* dobavihme cleanup funkciq, za da ne ostava zaglavieto na filma v taskbar-a, sled kato sme go zatvorili */
+/* Poluchavat se tvyrde mnogo zaqvki, imame i race condition. Tova popravqme tuk.
+Poluchava se i drug problem, za koyto zabravih kak da obqsnq, v nachaloto na 156-ta lekciq e.
+Mozhe da se vidi v browser-a v network i Fetch/XHR - zaqvkite sa mnogo */
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -97,13 +99,18 @@ export default function App() {
 
   useEffect(
     function () {
+      const controller = new AbortController();
+      /* abortcontroller-a e browser API, nqma obshto s reakt, ami s browser-a. Toy e za da napravim taka, che
+      da nqma tvyrde mnogo zaqvki */
+
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError(""); // tr da resetnem error state-a. Sled kato dolu se poluchi greshka, ako ne go resetnem
           // tuk, nqma da se poluchi otnovo
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
           );
 
           if (!res.ok)
@@ -115,9 +122,14 @@ export default function App() {
           if (data.Response === "False") throw new Error("Movie not found");
 
           setMovies(data.Search);
+          setError("");
         } catch (err) {
           console.log(err.message);
-          setError(err.message);
+
+          // tova e, za da ne se izpisva edno neshto, koeto ne e greshka, kato greshka zaradi abortcontroller-a
+          if (err.name !== "AbortError") {
+            setError(err.message);
+          }
         } finally {
           setIsLoading(false);
         }
@@ -130,6 +142,10 @@ export default function App() {
       }
 
       fetchMovies();
+      // TOVA DOLU E CLEANUP FUNKCIQ
+      return function () {
+        controller.abort();
+      };
     },
     [query]
   );
