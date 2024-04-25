@@ -52,9 +52,7 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* Pravim taka, che da se poqvqva zaglavieto v bar-a (v linka). Samo che taka ima problem, a toy e che ostava
-syshtoto, kato zatvorim filma. Tozi problem shte reshim v sledvashtata lekciq - zatova shte ni tr cleanup v
-useEffect-a */
+/* dobavihme cleanup funkciq, za da ne ostava zaglavieto na filma v taskbar-a, sled kato sme go zatvorili */
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -336,16 +334,20 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   );
 
   useEffect(
-    //!! Taka se poluchava problem. Ako se vyrnem, prodylzava da stoi syshtoto zaglavie. Tova popravqme v
-    // sledvashtata lekciq
     function () {
       if (!title) return;
       // tova if e za da ne izpisva undefined v nachaloto, kakto se poluchava bez nego syvsem zamalko
       document.title = `Movie | ${title}`;
+
+      // tova dolu e cleanup funkciq. Tq raboti na principa na closure-a. Kogato zatvorim filma, shte se
+      // izpishe console log-a dolu, zashtoto tq pomni. Po tozi nachin veche zaglavieto izghezva, kato zatvorim
+      // fila.
+      return function () {
+        document.title = "usePopcorn";
+        console.log(`Clean up effect for movie ${title}`);
+      };
     },
     [title]
-    /* tuk ako nqma title, a prazen array, shte izpisva undefined, ponezhe v nachaloto obektyt e prazen
-    (po-podrobno obqsneno vyv videoto nqkyde v 4-tata/5-tata minuta) */
   );
 
   // tova &larr; dolu e strelka nalqvo. S neq vryshtame nazad v sluchaq (ili zatvarqme otvoreniq film)
