@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* kak da NE izbirame DOM elementi v reakt */
+/* useRef hook - po-dobriqt nachin i pravilniqt v sravnenie s tozi ot predishnata lekciq */
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -168,12 +168,43 @@ function Logo() {
 }
 
 function Search({ query, setQuery }) {
-  // nepravilniqt nachin da izberem DOM element v reakt
+  const inputEl = useRef(null);
+
+  useEffect(
+    function () {
+      function callback(e) {
+        // tova e za da ne se trie vyvedenoto, ako pak natisnem enter, dokato tyrsachkata e aktivna
+        // t.e. kazvame mu prosto "ne pravi nishto"
+        if (document.activeElement === inputEl.current) return;
+
+        // pravim go taka, zashtoto inache se aktivirashe pri vseki natisnat buton, a tr da e samo pri enter
+        if (e.code === "Enter") {
+          inputEl.current.focus();
+          setQuery("");
+        }
+      }
+
+      // kak da napr taka, che kato natisnem enter, tyrsachkata za filmi da se aktivira (malko po-gore ima
+      // vazhno utochnenie, zashtoto taka shte e s vseki key, a tr samo s enter)
+      document.addEventListener("keydown", callback);
+      return () => document.addEventListener("keydown", callback);
+    },
+    [setQuery]
+  );
+
   useEffect(function () {
-    const el = document.querySelector(".search");
-    console.log(el);
-    el.focus();
+    console.log(inputEl.current); // <input class="search" type="text" placeholder="Search movies..." value> - tova e DOM elementa
+    // We need to read the current property which is basically like that box where whatever we store in the ref
+    // will get stored. And so inputEl.current is now really the DOM element itself.
+    inputEl.current.focus();
   }, []);
+
+  // nepravilniqt nachin da izberem DOM element v reakt
+  // useEffect(function () {
+  //   const el = document.querySelector(".search");
+  //   console.log(el);
+  //   el.focus();
+  // }, []);
 
   return (
     <input
@@ -182,6 +213,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEl}
     />
   );
 }
