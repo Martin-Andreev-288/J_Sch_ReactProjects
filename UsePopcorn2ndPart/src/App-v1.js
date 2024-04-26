@@ -1,17 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 import { useMovies } from "./useMovies";
+import { useLocalStorageState } from "./useLocalStorageState";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* So there are basically two strategies to decide if you want to create a new custom hook. The first one is
-that we want to reuse some part of our non-visual logic, so just as we learned in the previous lecture. And the
-second factor may be that we simply want to extract a huge part of our component out into some custom hook.
-And so that's actually what we will do in this lecture.
-In this lecture it's shown to us how we can extract all the stateful logic that belongs together into a nice
-and well-packaged custom hook. */
+/* In this lecture we're going to create a new custom hook called useLocalStorageState which basically will
+behave exactly like the useState hook, but where the state ctually gets stored in local storage */
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
@@ -22,13 +19,7 @@ export default function App() {
   // veche pak si raboti i tq.
   const { movies, isLoading, error } = useMovies(query);
 
-  // const [watched, setWatched] = useState([]);
-  // tuk promenqme tozi state, za nachalna stoynost zadavame callback funkciq.
-  const [watched, setWatched] = useState(function () {
-    const storedValue = localStorage.getItem("watched");
-    // tr da rekonvertnem dannite pak, ponezhe gi prevyrnahme v string, a taka dava greshka
-    return JSON.parse(storedValue);
-  });
+  const [watched, setWatched] = useLocalStorageState([], "watched");
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -45,15 +36,6 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
-
-  // tr da e JSON.stringify, zashtoto localStorage izpolzva samo stringove
-  /* mozhem da vidim zapazenoto v storage-a v Application -> Storage -> Local storage */
-  useEffect(
-    function () {
-      localStorage.setItem("watched", JSON.stringify(watched));
-    },
-    [watched]
-  );
 
   return (
     <>
