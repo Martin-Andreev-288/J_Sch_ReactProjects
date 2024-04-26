@@ -1,22 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
+import { useMovies } from "./useMovies";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* useRef hook - drug povod na izpolzvane - kogato neshto promeneno ne predizvikva re-rendervane, kogato se
-update-ne. Opitvame se da prebroim broq na klikaniqta vyrhu rating-a na user-a predi da go dobavi vyv favorites
-So we created a ref where we want to store the amount of clicks that happened on the rating
-  before the movie is added but we don't want to render that information onto the user interface. Or in
-  other words, we do not want to create a re-render.
-Za da vidim dali raboti, po-dobre da izgledame videoto (okolo sredata lektora pokazva) */
+/* So there are basically two strategies to decide if you want to create a new custom hook. The first one is
+that we want to reuse some part of our non-visual logic, so just as we learned in the previous lecture. And the
+second factor may be that we simply want to extract a huge part of our component out into some custom hook.
+And so that's actually what we will do in this lecture.
+In this lecture it's shown to us how we can extract all the stateful logic that belongs together into a nice
+and well-packaged custom hook. */
 export default function App() {
   const [query, setQuery] = useState("");
-  const [movies, setMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+
+  // tezi neshta za vyrnati ot drugiq fayl. Kogato gi napishem tuk taka, pak zapochva da si raboti po syshtiq
+  // nachin, kakto i predi da napravim tova. SAMO f-qta za zatvarqne na filma ne raboteshe.
+  // Zatova dobavihme handleCloseMovie i napisahme callback?.(); v drugiq fayl. Taka se poluchava hoisting i
+  // veche pak si raboti i tq.
+  const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
 
   // const [watched, setWatched] = useState([]);
   // tuk promenqme tozi state, za nachalna stoynost zadavame callback funkciq.
@@ -49,60 +53,6 @@ export default function App() {
       localStorage.setItem("watched", JSON.stringify(watched));
     },
     [watched]
-  );
-
-  useEffect(
-    function () {
-      const controller = new AbortController();
-      /* abortcontroller-a e browser API, nqma obshto s reakt, ami s browser-a. Toy e za da napravim taka, che
-      da nqma tvyrde mnogo zaqvki */
-
-      async function fetchMovies() {
-        try {
-          setIsLoading(true);
-          setError(""); // tr da resetnem error state-a. Sled kato dolu se poluchi greshka, ako ne go resetnem
-          // tuk, nqma da se poluchi otnovo
-          const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-            { signal: controller.signal }
-          );
-
-          if (!res.ok)
-            throw new Error("Something went wrong with fetching movies");
-
-          const data = await res.json();
-          console.log(data);
-
-          if (data.Response === "False") throw new Error("Movie not found");
-
-          setMovies(data.Search);
-          setError("");
-        } catch (err) {
-          // tova e, za da ne se izpisva edno neshto, koeto ne e greshka, kato greshka zaradi abortcontroller-a
-          if (err.name !== "AbortError") {
-            console.log(err.message);
-            setError(err.message);
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      // taka veche ne pokazva nishto, ako nqma pone 3 vyvedeni bukvi v searchbar-a
-      if (query.length < 3) {
-        setMovies([]);
-        setError("");
-        return;
-      }
-
-      // tova e za da se zatvori filma, ako zapochnem da vyvezhdame zaglavieto na drug.
-      handleCloseMovie();
-      fetchMovies();
-      // TOVA DOLU E CLEANUP FUNKCIQ
-      return function () {
-        controller.abort();
-      };
-    },
-    [query]
   );
 
   return (
