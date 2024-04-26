@@ -5,15 +5,22 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* Pravim taka, che da mozhem da zatvarqme filma i s escape. Za tazi cel se nalozhi da izlezem ot reakt i da
-se vyrnem kym DOM (t.e. s addEventListener) */
+/* tuk izpolzvame localStorage, za da se zapazqt veche dobavenite filmi v "watched" (zashtoto dosega
+izchezvaha pri prezarezhdane) */
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+
+  // const [watched, setWatched] = useState([]);
+  // tuk promenqme tozi state, za nachalna stoynost zadavame callback funkciq.
+  const [watched, setWatched] = useState(function () {
+    const storedValue = localStorage.getItem("watched");
+    // tr da rekonvertnem dannite pak, ponezhe gi prevyrnahme v string, a taka dava greshka
+    return JSON.parse(storedValue);
+  });
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -25,11 +32,24 @@ export default function App() {
 
   function handleAddWatched(movie) {
     setWatched((watched) => [...watched, movie]);
+
+    // taka izpolzvame localStorage s eventhandler function, no go zakomentirahme, zashtoto shte go napravim i s
+    // useEffect dolu, zashtoto iskame da napravim tazi storing data reusable
+    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
+    /* mozhem da vidim zapazenoto v storage-a v Application -> Storage -> Local storage */
   }
 
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
+
+  // tr da e JSON.stringify, zashtoto localStorage izpolzva samo stringove
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
 
   useEffect(
     function () {
