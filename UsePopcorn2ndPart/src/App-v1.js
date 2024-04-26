@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 import { useMovies } from "./useMovies";
 import { useLocalStorageState } from "./useLocalStorageState";
+import { useKey } from "./useKey";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* In this lecture we're going to create a new custom hook called useLocalStorageState which basically will
-behave exactly like the useState hook, but where the state ctually gets stored in local storage */
+/* pravim useKey, za da raboti escape butona, t.e. da mozhem da zatvarqme movie i s nego
+pravim taka i che kato natisnem enter, da se aktivira tyrsachkata */
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
@@ -107,34 +108,13 @@ function Logo() {
 function Search({ query, setQuery }) {
   const inputEl = useRef(null);
 
-  useEffect(
-    function () {
-      function callback(e) {
-        // tova e za da ne se trie vyvedenoto, ako pak natisnem enter, dokato tyrsachkata e aktivna
-        // t.e. kazvame mu prosto "ne pravi nishto"
-        if (document.activeElement === inputEl.current) return;
-
-        // pravim go taka, zashtoto inache se aktivirashe pri vseki natisnat buton, a tr da e samo pri enter
-        if (e.code === "Enter") {
-          inputEl.current.focus();
-          setQuery("");
-        }
-      }
-
-      // kak da napr taka, che kato natisnem enter, tyrsachkata za filmi da se aktivira (malko po-gore ima
-      // vazhno utochnenie, zashtoto taka shte e s vseki key, a tr samo s enter)
-      document.addEventListener("keydown", callback);
-      return () => document.addEventListener("keydown", callback);
-    },
-    [setQuery]
-  );
-
-  useEffect(function () {
-    console.log(inputEl.current); // <input class="search" type="text" placeholder="Search movies..." value> - tova e DOM elementa
-    // We need to read the current property which is basically like that box where whatever we store in the ref
-    // will get stored. And so inputEl.current is now really the DOM element itself.
+  useKey("Enter", function () {
+    // tova e za da ne se trie vyvedenoto, ako pak natisnem enter, dokato tyrsachkata e aktivna
+    // t.e. kazvame mu prosto "ne pravi nishto"
+    if (document.activeElement === inputEl.current) return;
     inputEl.current.focus();
-  }, []);
+    setQuery("");
+  });
 
   // nepravilniqt nachin da izberem DOM element v reakt
   // useEffect(function () {
@@ -281,24 +261,8 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   attached to the document which of course, is not what we want. Po tazi prichina nay-dolu dobavqne cleanup
   funkciq (callback)
    */
-  useEffect(
-    function () {
-      function callback(e) {
-        if (e.code === "Escape") {
-          onCloseMovie();
-          console.log("CLOSING");
-        }
-      }
 
-      document.addEventListener("keydown", callback);
-
-      // callback funkciq
-      return function () {
-        document.removeEventListener("keydown", callback);
-      };
-    },
-    [onCloseMovie]
-  );
+  useKey("Escape", onCloseMovie);
 
   console.log(title, year); // purvonachalno printi undefined undefined, sled tova veche si printi zaglavieto
   // i godinata. Tova e zaradi procesa s await/useEffect () - pyrvonachalno e prazen obekt gore, posle

@@ -7,4 +7,7 @@ Tozi proekt e ot vtora chast na kursa i se vodi intermediate.
 # UsePopcorn
 
 V kursa jonas syzdava fayl App-v2.js, za da zapazi predishnata versiq na koda.
-Az prosto syzdadoh nova papka (zatova faylyt prodylzhava da si se kazva App-v1.js).
+Az prosto syzdadoh nova papka UsePopcorn2ndPart (zatova faylyt prodylzhava da si se kazva App-v1.js).
+
+Ot 170-ta lekciq natatyk zapochvame da syzdavame hook-ove. Jonas malko kysno kaza, che e napravil i treto kopie
+ma papka, zatova da utochnim, che predi hookovete posledniq push e v 168-ma lekciq (169-ta e teoretichna)
