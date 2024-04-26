@@ -6,7 +6,7 @@ const KEY = "95b5ad09";
 
 // priemame query kato parametyr. Tova ne e komponent, taka che nqma da go priemem kato props, a kato standarten
 // parametyr na funkciq
-export function useMovies(query, callback) {
+export function useMovies(query) {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -14,8 +14,9 @@ export function useMovies(query, callback) {
   useEffect(
     function () {
       // taka popravqme f-qta za zatvarqne na film. Za celta dobavqme parametyr handleCloseMovie na useMovies
-      // v drugiq fayl (sled query parametyra)
-      callback?.();
+      // v drugiq fayl (sled query parametyra). Samo che go mahnahme, zashtoto se poluchava slozhen za
+      //   razreshavane problem zasega
+      //   callback?.();
 
       const controller = new AbortController();
       /* abortcontroller-a e browser API, nqma obshto s reakt, ami s browser-a. Toy e za da napravim taka, che

@@ -20,7 +20,7 @@ export default function App() {
   // nachin, kakto i predi da napravim tova. SAMO f-qta za zatvarqne na filma ne raboteshe.
   // Zatova dobavihme handleCloseMovie i napisahme callback?.(); v drugiq fayl. Taka se poluchava hoisting i
   // veche pak si raboti i tq.
-  const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
+  const { movies, isLoading, error } = useMovies(query);
 
   // const [watched, setWatched] = useState([]);
   // tuk promenqme tozi state, za nachalna stoynost zadavame callback funkciq.
