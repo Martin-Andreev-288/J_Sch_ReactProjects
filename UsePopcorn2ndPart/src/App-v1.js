@@ -5,8 +5,7 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* tuk izpolzvame localStorage, za da se zapazqt veche dobavenite filmi v "watched" (zashtoto dosega
-izchezvaha pri prezarezhdane) */
+/* kak da NE izbirame DOM elementi v reakt */
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -32,11 +31,6 @@ export default function App() {
 
   function handleAddWatched(movie) {
     setWatched((watched) => [...watched, movie]);
-
-    // taka izpolzvame localStorage s eventhandler function, no go zakomentirahme, zashtoto shte go napravim i s
-    // useEffect dolu, zashtoto iskame da napravim tazi storing data reusable
-    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
-    /* mozhem da vidim zapazenoto v storage-a v Application -> Storage -> Local storage */
   }
 
   function handleDeleteWatched(id) {
@@ -44,6 +38,7 @@ export default function App() {
   }
 
   // tr da e JSON.stringify, zashtoto localStorage izpolzva samo stringove
+  /* mozhem da vidim zapazenoto v storage-a v Application -> Storage -> Local storage */
   useEffect(
     function () {
       localStorage.setItem("watched", JSON.stringify(watched));
@@ -173,6 +168,13 @@ function Logo() {
 }
 
 function Search({ query, setQuery }) {
+  // nepravilniqt nachin da izberem DOM element v reakt
+  useEffect(function () {
+    const el = document.querySelector(".search");
+    console.log(el);
+    el.focus();
+  }, []);
+
   return (
     <input
       className="search"
