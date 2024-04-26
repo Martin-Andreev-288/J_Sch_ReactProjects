@@ -5,7 +5,12 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* useRef hook - po-dobriqt nachin i pravilniqt v sravnenie s tozi ot predishnata lekciq */
+/* useRef hook - drug povod na izpolzvane - kogato neshto promeneno ne predizvikva re-rendervane, kogato se
+update-ne. Opitvame se da prebroim broq na klikaniqta vyrhu rating-a na user-a predi da go dobavi vyv favorites
+So we created a ref where we want to store the amount of clicks that happened on the rating
+  before the movie is added but we don't want to render that information onto the user interface. Or in
+  other words, we do not want to create a re-render.
+Za da vidim dali raboti, po-dobre da izgledame videoto (okolo sredata lektora pokazva) */
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -282,6 +287,25 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
+  // So we created this ref here where we want to store the amount of clicks that happened on the rating
+  // before the movie is added but we don't want to render that information onto the user interface. Or in
+  // other words, we do not want to create a re-render.
+  const countRef = useRef(0);
+  // we are not allowed to mutate the ref in render logic, so we must use useEffect.
+
+  useEffect(
+    function () {
+      if (userRating) countRef.current++;
+      // so with a ref, we don't have a set function but instead we simply mutate the current property which is
+      // in the ref. And so that's why we say that a ref is basically like a box that can hold any value.
+      // ako go napravim s obiknovena promenliva (primerno let count = 0; vmesto const countRef = useRef(0)),
+      // nqma da raboti, zashtoto tq shte se reset-va sled vsqko rerend-yrvane i vinagi shte se vryshta na 0
+      // i nakraq rezultatyt na klikaniqta shte si e 1 sled poslednoto klikane, kogato count-yt se dobavq v
+      // obekta.
+    },
+    [userRating]
+  );
+
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
   // tova dolnoto e da se poqvqva rating-a na user-a, ako e glasuval
   const watchedUserRating = watched.find(
@@ -311,6 +335,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0)),
       userRating,
+      countRatingDecisions: countRef.current,
     };
 
     onAddWatched(newWatchedMovie);
