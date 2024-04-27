@@ -8,6 +8,14 @@ import Question from "./Question";
 import NextButton from "./NextButton";
 import Progress from "./Progress";
 import FinishScreen from "./FinishScreen";
+import Timer from "./Timer";
+import Footer from "./Footer";
+/* !!!!!!!!!!!!!!!Tuk prilozhenieto/vsichki komponenti rerendyrvat vsqka sekunda, koeto v po-golqmo prilozhenie
+ bi bilo problem i ppc ne tr da e taka (glavniq komponent da rerendyrva vsqka sekunda). No tuk ne e problem */
+
+// ne e ok da imame "magic" numbers, t.e. napravo dolu da pishem 30. Po-dobre da napravim konstanta i taka
+// inache Jonas vyv videoto e napisal 30 sekundi na vypros, no realno sa 20, makar i da ne se vizhda 20, a 30
+const SECS_PER_QUESTION = 20;
 
 const initialState = {
   questions: [],
@@ -17,6 +25,7 @@ const initialState = {
   answer: null,
   points: 0,
   highscore: 0,
+  secondsRemaining: null,
 };
 
 function reducer(state, action) {
@@ -34,7 +43,11 @@ function reducer(state, action) {
         status: "error",
       };
     case "start":
-      return { ...state, status: "active" };
+      return {
+        ...state,
+        status: "active",
+        secondsRemaining: state.questions.length * SECS_PER_QUESTION,
+      };
     case "newAnswer":
       const question = state.questions.at(state.index);
 
@@ -69,6 +82,14 @@ function reducer(state, action) {
     //   status: "ready",
     // };
 
+    case "tick":
+      return {
+        ...state,
+        secondsRemaining: state.secondsRemaining - 1,
+        // da priklyuchi quiz-a, kogato ostavashtite sekundi sa veche 0:
+        status: state.secondsRemaining === 0 ? "finished" : state.status,
+      };
+
     default:
       throw new Error("Action unknown");
   }
@@ -77,8 +98,10 @@ function reducer(state, action) {
 export default function App() {
   // ako dolu conditionally display-nem komponentite (v Main), shte e mnogo rabota, zatova po-dobre da
   // destrukturirame state obekta
-  const [{ questions, status, index, answer, points, highscore }, dispatch] =
-    useReducer(reducer, initialState);
+  const [
+    { questions, status, index, answer, points, highscore, secondsRemaining },
+    dispatch,
+  ] = useReducer(reducer, initialState);
 
   const numQuestions = questions.length;
   const maxPossiblePoints = questions.reduce(
@@ -119,12 +142,15 @@ export default function App() {
               dispatch={dispatch}
               answer={answer}
             />
-            <NextButton
-              dispatch={dispatch}
-              answer={answer}
-              numQuestions={numQuestions}
-              index={index}
-            />
+            <Footer>
+              <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />
+              <NextButton
+                dispatch={dispatch}
+                answer={answer}
+                numQuestions={numQuestions}
+                index={index}
+              />
+            </Footer>
           </>
         )}
         {status === "finished" && (
