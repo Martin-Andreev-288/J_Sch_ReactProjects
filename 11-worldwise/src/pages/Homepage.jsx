@@ -1,21 +1,27 @@
 import { Link } from "react-router-dom";
 import PageNav from "../components/PageNav";
-import AppNav from "../components/AppNav";
-// tuk experimentirame. Ideqta e da vidim, che dori da ima elementi, koito da zapochvat po edin i syshti nachin
-// (v sluchaq - s nav), imat klasove s razlichni imena i se razlichavat, t.e. ne se sluchva koliziq.
-function Homepage() {
-    return (
-        <div>
-            <PageNav />
-            <AppNav />
-            <h1 className="test">WorldWise</h1>
-            {/* <a href="/pricing">Pricing</a> taka stranicata shte se prezarezhda, a ne iskame tova
-            Tova mozhe da se proveri v Network -> All
-            Zatova izpolzvame Link: */}
+import styles from "./Homepage.module.css";
 
-            <Link to="/app">Go to the app</Link>
-        </div>
-    );
+export default function Homepage() {
+  return (
+    <main className={styles.homepage}>
+      <PageNav />
+
+      <section>
+        <h1>
+          You travel the world.
+          <br />
+          WorldWise keeps track of your adventures.
+        </h1>
+        <h2>
+          A world map that tracks your footsteps into every city you can think
+          of. Never forget your wonderful experiences, and show your friends how
+          you have wandered the world.
+        </h2>
+        <Link to="/app" className="cta">
+          Start tracking now
+        </Link>
+      </section>
+    </main>
+  );
 }
-
-export default Homepage;
