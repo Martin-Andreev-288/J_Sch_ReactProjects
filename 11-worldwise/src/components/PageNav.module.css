@@ -1,0 +1,21 @@
+.nav {
+    background-color: orangered;
+}
+
+ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* tuk implementirame globalni promenlivi. Ago nqma tova :global i skobite, nqma da se otrazqt, zashtoto shte se
+dobavqt onezi stranni random imena sled klasovete i nqma da syvpadnat s tezi tuk
+Taka ili inache ako iskame da syzdadem globalni klasove, ne tr da e v modul, kakto tuk, a v globalen CSS file,
+kakyvto e index.css */
+.nav :global(.active) {
+    background-color: green;
+}
+
+/* :global(.test) {
+    background-color: red;
+} */

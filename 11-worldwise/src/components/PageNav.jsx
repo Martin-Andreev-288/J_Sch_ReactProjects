@@ -1,9 +1,10 @@
 import { NavLink } from "react-router-dom";
+import styles from "./PageNav.module.css";
 
 function PageNav() {
     // s NavLink se dobavq class="active" na izbranata stranica v dom dyrvoto (mozhem da vidim, ako inspektnem).
     return (
-        <nav>
+        <nav className={styles.nav}>
             <ul>
                 <li>
                     <NavLink to="/">Home</NavLink>
