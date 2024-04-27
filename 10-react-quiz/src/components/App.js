@@ -10,6 +10,7 @@ const initialState = {
   questions: [],
   status: "loading", // tozi pyt vmesto s isLoading, go pravim taka. Prilozhenieto ppc ima nqkolko statusa:
   // 'loading', 'error', 'ready', 'active', 'finished'
+  index: 0,
 };
 
 function reducer(state, action) {
@@ -37,7 +38,10 @@ function reducer(state, action) {
 export default function App() {
   // ako dolu conditionally display-nem komponentite (v Main), shte e mnogo rabota, zatova po-dobre da
   // destrukturirame state obekta
-  const [{ questions, status }, dispatch] = useReducer(reducer, initialState);
+  const [{ questions, status, index }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   const numQuestions = questions.length;
 
@@ -60,7 +64,7 @@ export default function App() {
         {status === "ready" && (
           <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
         )}
-        {status === "active" && <Question />}
+        {status === "active" && <Question question={questions[index]} />}
       </Main>
     </div>
   );
