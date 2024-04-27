@@ -11,3 +11,7 @@ Az prosto syzdadoh nova papka UsePopcorn2ndPart (zatova faylyt prodylzhava da si
 
 Ot 170-ta lekciq natatyk zapochvame da syzdavame hook-ove. Jonas malko kysno kaza, che e napravil i treto kopie
 ma papka, zatova da utochnim, che predi hookovete posledniq push e v 168-ma lekciq (169-ta e teoretichna)
+
+!!!!!!!!!!!!!!!!!!Ot proekt 11 natatyk startirame proekti s vite!
+
+npm create vite@4 - taka iska Jonas, za da rabotim s ednakvi versii. Inache - npm create vite@latest
