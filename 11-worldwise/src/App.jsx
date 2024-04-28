@@ -35,14 +35,6 @@ function App() {
     fetchCities();
   }, []);
 
-  /* <Navigate /> veche ne se izpolzva tolkova, no ima 1 mnogo vazhen use case za nego.
-  Sega ako v prilozhenieto natisnem start tracking now butona, shte vidim gradovete, no URL-a shte e
-  http://localhost:5173/app, t.e. gradovete nqma da sa v nego (nqma da e http://localhost:5173/app/cities).
-  Za da stane taka po tozi nachin, tr da cyknem na cities i edva togava se dobavqt.
-  Za da popravim tova, izpolzvame <Navigate /> eto taka:
-  Problemyt e, che ako e samo s Navigate, nqma da mozhem da se vyrnem s back butona na browser-a, zatova tr da
-  napishem replace and this will then replace the current element in the history stack.
-  Inache tova e deklarativen nachin, a s Navigate funkciqta e imperativen nachin. */
   return (
     <BrowserRouter>
       <Routes>
