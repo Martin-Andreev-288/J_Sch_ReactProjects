@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 import styles from "./City.module.css";
 
 const formatDate = (date) =>
@@ -9,6 +10,12 @@ const formatDate = (date) =>
   }).format(new Date(date));
 
 function City() {
+  const { id } = useParams();
+  // console.log(id); // i taka vizhdame obekt s id - {id: '73930385'}. Prichinata kliucha da se kazva id e, che
+  // sme go krystili taka v App.js - Route path='cities/:id'. Ako go imenuvame Route path='cities/:city', shte
+  // izliza kato {city: '73930385'}. I ponezhe e obekt - go destrukturirame. t.e. const {id}, a en const id.
+  // i tova id e id-to na syotvetniq grad ot fayla s gradovete, s koyto syzdavame fake fetch.
+
   // TEMP DATA
   const currentCity = {
     cityName: "Lisbon",
@@ -19,43 +26,45 @@ function City() {
 
   const { cityName, emoji, date, notes } = currentCity;
 
-  return (
-    <div className={styles.city}>
-      <div className={styles.row}>
-        <h6>City name</h6>
-        <h3>
-          <span>{emoji}</span> {cityName}
-        </h3>
-      </div>
+  return <h1>City {id}</h1>
 
-      <div className={styles.row}>
-        <h6>You went to {cityName} on</h6>
-        <p>{formatDate(date || null)}</p>
-      </div>
+  // return (
+  //   <div className={styles.city}>
+  //     <div className={styles.row}>
+  //       <h6>City name</h6>
+  //       <h3>
+  //         <span>{emoji}</span> {cityName}
+  //       </h3>
+  //     </div>
 
-      {notes && (
-        <div className={styles.row}>
-          <h6>Your notes</h6>
-          <p>{notes}</p>
-        </div>
-      )}
+  //     <div className={styles.row}>
+  //       <h6>You went to {cityName} on</h6>
+  //       <p>{formatDate(date || null)}</p>
+  //     </div>
 
-      <div className={styles.row}>
-        <h6>Learn more</h6>
-        <a
-          href={`https://en.wikipedia.org/wiki/${cityName}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Check out {cityName} on Wikipedia &rarr;
-        </a>
-      </div>
+  //     {notes && (
+  //       <div className={styles.row}>
+  //         <h6>Your notes</h6>
+  //         <p>{notes}</p>
+  //       </div>
+  //     )}
 
-      <div>
-        <ButtonBack />
-      </div>
-    </div>
-  );
+  //     <div className={styles.row}>
+  //       <h6>Learn more</h6>
+  //       <a
+  //         href={`https://en.wikipedia.org/wiki/${cityName}`}
+  //         target="_blank"
+  //         rel="noreferrer"
+  //       >
+  //         Check out {cityName} on Wikipedia &rarr;
+  //       </a>
+  //     </div>
+
+  //     <div>
+
+  //     </div>
+  //   </div>
+  // );
 }
 
 export default City;
