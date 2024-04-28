@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import styles from "./City.module.css";
 
 const formatDate = (date) =>
@@ -16,6 +16,10 @@ function City() {
   // izliza kato {city: '73930385'}. I ponezhe e obekt - go destrukturirame. t.e. const {id}, a en const id.
   // i tova id e id-to na syotvetniq grad ot fayla s gradovete, s koyto syzdavame fake fetch.
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const lat = searchParams.get("lat");
+  const lng = searchParams.get("lng");
+
   // TEMP DATA
   const currentCity = {
     cityName: "Lisbon",
@@ -26,8 +30,14 @@ function City() {
 
   const { cityName, emoji, date, notes } = currentCity;
 
-  return <h1>City {id}</h1>
-
+  return (
+    <>
+      <h1>City {id}</h1>
+      <p>Position: {lat}, {lng}</p>
+    </>
+    /* i taka izpisva City 252525
+Position: 50.53586782505711, 14.376933665713324 */
+  )
   // return (
   //   <div className={styles.city}>
   //     <div className={styles.row}>
