@@ -8,8 +8,7 @@ function createRandomPost() {
     body: faker.hacker.phrase(),
   };
 }
-/* Vyv vtorata chast ideqta e ponezhe na mnogo mesta pishem useContext(PostContext), da go ekstraktnem v
-PostContext fayl-a i da go zamenim tuk. Taka shte e po-chisto.
+/*
  */
 
 function App() {
