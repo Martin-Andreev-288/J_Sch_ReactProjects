@@ -3,6 +3,8 @@
 import { useState } from "react";
 
 import styles from "./Form.module.css";
+import Button from "./Button";
+import { useNavigate } from "react-router-dom";
 
 export function convertToEmoji(countryCode) {
   const codePoints = countryCode
@@ -13,6 +15,8 @@ export function convertToEmoji(countryCode) {
 }
 
 function Form() {
+  const navigate = useNavigate();
+
   const [cityName, setCityName] = useState("");
   const [country, setCountry] = useState("");
   const [date, setDate] = useState(new Date());
@@ -49,8 +53,24 @@ function Form() {
       </div>
 
       <div className={styles.buttons}>
-        <button>Add</button>
-        <button>&larr; Back</button>
+        {/* ponezhe ima 3 vida butona (s 3 razlichni klasa v Button.module.css), s type mozhem da vyvedem edno
+         ot 3-te imena. Tuk go pishem taka, posle se predava v Button.jsx i se izpolzva v className-a
+         Vizh razqsnenieto i tam, zashtoto ima vazhno prodylzhenie.
+         Inache tuk imame primer s 2 razlichni butona, koito se formatirat po 1 i syshti nachin (izpolzvani sa
+         2 razlichni klasa za 2-ta po interesen nachin).
+         Inache tuk butona se namira vyv formata, koeto znachi, che ako cyknem back, this will trigger the form
+         to be submitted. And so that will then cause the page to reload. I ZA TOVA tr da dobavim prevent
+         default. */}
+        <Button type="primary">Add</Button>
+        <Button
+          type="back"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate(-1);
+          }}
+        >
+          &larr; Back
+        </Button>
       </div>
     </form>
   );
