@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { faker } from "@faker-js/faker";
 
 function createRandomPost() {
@@ -7,11 +7,8 @@ function createRandomPost() {
     body: faker.hacker.phrase(),
   };
 }
-/* edin ot prop drilling pytishtata -> za posts -> App, Main, Posts, List
-tova, koeto podadem v createContext, ne se promenq s vremeto, zatova ne e dobra ideq da podavame a default
-value for this context. Zatova obiknoveno podavame null ili prosto nishto.
-Inache promenlivata, koqto syzdavame s createContext, e komponent, zatova q syzdavame s glavna bukva.
-*/
+/* sega triem propsovete from one component at a time.
+ */
 // 1) Create a context
 const PostContext = createContext();
 
@@ -68,39 +65,40 @@ function App() {
           {isFakeDark ? "☀️" : "🌙"}
         </button>
 
-        <Header
-          posts={searchedPosts}
-          onClearPosts={handleClearPosts}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
-        <Main posts={searchedPosts} onAddPost={handleAddPost} />
-        <Archive onAddPost={handleAddPost} />
+        <Header />
+        <Main />
+        <Archive />
         <Footer />
       </section>
     </PostContext.Provider>
   );
 }
 
-function Header({ posts, onClearPosts, searchQuery, setSearchQuery }) {
+function Header() {
+  // ponezhe onClearPosts se polzva v butona dolu, shte tr da izpolzvame useContext tuk
+  /* ako napishem const x = useContext(PostContext); i go console log-nem, shte vidim, che printi
+  obekt ot vsichki neshta vyv value-to na Post-Context-a, t.e. tochno kakto sme gi napisali vyv value. Zatova
+  mozhem da izpolzvame destrukturirane */
+  // 3) consuming context value
+  const { onClearPosts } = useContext(PostContext);
+
   return (
     <header>
       <h1>
         <span>⚛️</span>The Atomic Blog
       </h1>
       <div>
-        <Results posts={posts} />
-        <SearchPosts
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
+        <Results />
+        <SearchPosts />
         <button onClick={onClearPosts}>Clear posts</button>
       </div>
     </header>
   );
 }
 
-function SearchPosts({ searchQuery, setSearchQuery }) {
+function SearchPosts() {
+  const { searchQuery, setSearchQuery } = useContext(PostContext);
+
   return (
     <input
       value={searchQuery}
@@ -110,28 +108,31 @@ function SearchPosts({ searchQuery, setSearchQuery }) {
   );
 }
 
-function Results({ posts }) {
+function Results() {
+  const { posts } = useContext(PostContext);
+
   return <p>🚀 {posts.length} atomic posts found</p>;
 }
 
-function Main({ posts, onAddPost }) {
+function Main() {
   return (
     <main>
-      <FormAddPost onAddPost={onAddPost} />
-      <Posts posts={posts} />
+      <FormAddPost />
+      <Posts />
     </main>
   );
 }
 
-function Posts({ posts }) {
+function Posts() {
   return (
     <section>
-      <List posts={posts} />
+      <List />
     </section>
   );
 }
 
-function FormAddPost({ onAddPost }) {
+function FormAddPost() {
+  const { onAddPost } = useContext(PostContext);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
@@ -160,7 +161,9 @@ function FormAddPost({ onAddPost }) {
   );
 }
 
-function List({ posts }) {
+function List() {
+  const { posts } = useContext(PostContext);
+
   return (
     <ul>
       {posts.map((post, i) => (
@@ -173,7 +176,8 @@ function List({ posts }) {
   );
 }
 
-function Archive({ onAddPost }) {
+function Archive() {
+  const { onAddPost } = useContext(PostContext);
   /* Here we don't need the setter function. We're only using state to store these posts because the callback
   function passed into useState (which generates the posts) is only called once, on the initial render. So we
   use this trick as an optimization technique, because if we just used a regular variable, these posts would
