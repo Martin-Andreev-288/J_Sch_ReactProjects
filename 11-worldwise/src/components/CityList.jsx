@@ -2,8 +2,10 @@ import Spinner from "./Spinner";
 import styles from './CityList.module.css';
 import CityItem from "./CityItem";
 import Message from "./Message";
+import { useCities } from "../contexts/CitiesContext";
 
-function CityList({ cities, isLoading }) {
+function CityList() {
+    const { cities, isLoading } = useCities();
     // pri men obache spinner-a ne mozhe da se poluchi, ima problem s tova --delay 500 v json fayla i go mahnah
     if (isLoading) return <Spinner />;
 
