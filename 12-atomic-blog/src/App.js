@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { faker } from "@faker-js/faker";
 
 function createRandomPost() {
@@ -7,6 +7,13 @@ function createRandomPost() {
     body: faker.hacker.phrase(),
   };
 }
+/* edin ot prop drilling pytishtata -> za posts -> App, Main, Posts, List
+tova, koeto podadem v createContext, ne se promenq s vremeto, zatova ne e dobra ideq da podavame a default
+value for this context. Zatova obiknoveno podavame null ili prosto nishto.
+Inache promenlivata, koqto syzdavame s createContext, e komponent, zatova q syzdavame s glavna bukva.
+*/
+// 1) Create a context
+const PostContext = createContext();
 
 function App() {
   const [posts, setPosts] = useState(() =>
@@ -42,24 +49,36 @@ function App() {
   );
 
   return (
-    <section>
-      <button
-        onClick={() => setIsFakeDark((isFakeDark) => !isFakeDark)}
-        className="btn-fake-dark-mode"
-      >
-        {isFakeDark ? "☀️" : "🌙"}
-      </button>
+    // 2) Provide value to child components (searchquery i setSearchQuery mozhem da gi napishem taka, zashtoto
+    // imat ednakvi klyuchove i stoynosti (ne sym sig dali se narichat klyuchove i st-ti, no sa ednakvi))
+    <PostContext.Provider
+      value={{
+        posts: searchedPosts,
+        onAddPost: handleAddPost,
+        onClearPosts: handleClearPosts,
+        searchQuery,
+        setSearchQuery,
+      }}
+    >
+      <section>
+        <button
+          onClick={() => setIsFakeDark((isFakeDark) => !isFakeDark)}
+          className="btn-fake-dark-mode"
+        >
+          {isFakeDark ? "☀️" : "🌙"}
+        </button>
 
-      <Header
-        posts={searchedPosts}
-        onClearPosts={handleClearPosts}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
-      <Main posts={searchedPosts} onAddPost={handleAddPost} />
-      <Archive onAddPost={handleAddPost} />
-      <Footer />
-    </section>
+        <Header
+          posts={searchedPosts}
+          onClearPosts={handleClearPosts}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
+        <Main posts={searchedPosts} onAddPost={handleAddPost} />
+        <Archive onAddPost={handleAddPost} />
+        <Footer />
+      </section>
+    </PostContext.Provider>
   );
 }
 
