@@ -1,49 +1,111 @@
-import { useContext } from "react";
-import { createContext, useState, useEffect } from "react";
+import { useContext, useReducer } from "react";
+import { createContext, useEffect } from "react";
 
 const BASE_URL = "http://localhost:9000";
 
 const CitiesContext = createContext();
+/* pravim state i za error (tova e edinstvenoto novo neshto), zashtoto po tozi nachin nqmashe kak da se razbere,
+ako ima greshka */
+const initialState = {
+  cities: [],
+  isLoading: false,
+  currentCity: {},
+  error: "",
+};
+
+function reducer(state, action) {
+  /* tuk e po-dobre da imenuvame case-ovete kato eventi, a ne kato setyri /t.e. naprimer dolu da e setCities/.
+  So it's usually a good idea to mode these actions as events and not as setters because this makes it easier
+  to see all the related state transitions.
+  A kato e cities/loaded - it makes it really easy to understand that this is related to the cities and then
+  that they have been loaded in this case. */
+  switch (action.type) {
+    case "loading":
+      return { ...state, isLoading: true };
+
+    case "cities/loaded":
+      return {
+        ...state,
+        isLoading: false,
+        cities: action.payload,
+      };
+
+    case "city/loaded":
+      return { ...state, isLoading: false, currentCity: action.payload };
+
+    case "city/created":
+      return {
+        ...state,
+        isLoading: false,
+        cities: [...state.cities, action.payload],
+      };
+
+    case "city/deleted":
+      return {
+        ...state,
+        isLoading: false,
+        cities: state.cities.filter((city) => city.id !== action.payload),
+      };
+
+    case "rejected":
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
+      };
+
+    default:
+      throw new Error("Unknow action type");
+  }
+}
 
 function CitiesProvider({ children }) {
-  const [cities, setCities] = useState([]);
-  const [isLoading, setIsloading] = useState(false);
-  const [currentCity, setCurrentCity] = useState({});
-  /* tova 3-toto po-dobre da e tuk, a ne v City.jsx, zashtoto e globalel state (shte se polzva ot cities i
-    countries) */
+  const [{ cities, isLoading, currentCity, error }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   useEffect(function () {
     async function fetchCities() {
+      dispatch({ type: "loading" });
+
       try {
-        setIsloading(true);
         const res = await fetch(`${BASE_URL}/cities`);
         const data = await res.json();
-        setCities(data);
+        dispatch({ type: "cities/loaded", payload: data });
       } catch {
-        alert("There was an error loading data...");
-      } finally {
-        setIsloading(false);
+        dispatch({
+          type: "rejected",
+          payload: "There was an error loading cities...",
+        });
       }
     }
     fetchCities();
   }, []);
 
   async function getCity(id) {
+    if (Number(id) === currentCity.id)
+      return; /* taka sega ako cyknem na edin grad i se vyrnem i sl tova
+    venaga pak go cyknem - shte se zaredi vednaga, bez kratkoto zabavqne */
+
+    dispatch({ type: "loading" });
+
     try {
-      setIsloading(true);
       const res = await fetch(`${BASE_URL}/cities/${id}`);
       const data = await res.json();
-      setCurrentCity(data);
+      dispatch({ type: "city/loaded", payload: data });
     } catch {
-      alert("There was an error loading data...");
-    } finally {
-      setIsloading(false);
+      dispatch({
+        type: "rejected",
+        payload: "There was an error loading the city...",
+      });
     }
   }
 
   async function createCity(newCity) {
+    dispatch({ type: "loading" });
+
     try {
-      setIsloading(true);
       const res = await fetch(`${BASE_URL}/cities`, {
         method: "POST",
         body: JSON.stringify(newCity),
@@ -52,29 +114,30 @@ function CitiesProvider({ children }) {
         },
       });
       const data = await res.json();
-      // za da se update-nat gradovete (zashtoto inache shte vidim novodobaveniq chak sled kato prezaredim)
-      setCities((cities) => [...cities, data]);
-      // taka gradovete trqbva da se dobavqt i v cities.json fayla, no i tova ne stava
+
+      dispatch({ type: "city/created", payload: data });
     } catch {
-      alert("There was an error creating city...");
-    } finally {
-      setIsloading(false);
+      dispatch({
+        type: "rejected",
+        payload: "There was an error creating the city...",
+      });
     }
   }
 
   async function deleteCity(id) {
+    dispatch({ type: "loading" });
+
     try {
-      setIsloading(true);
       await fetch(`${BASE_URL}/cities/${id}`, {
         method: "DELETE",
       });
-      // za da se update-nat gradovete (zashtoto inache shte vidim novodobaveniq chak sled kato prezaredim)
-      setCities((cities) => cities.filter((city) => city.id !== id));
-      // taka gradovete trqbva da se dobavqt i v cities.json fayla, no i tova ne stava
+
+      dispatch({ type: "city/deleted", payload: id });
     } catch {
-      alert("There was an error deleting city...");
-    } finally {
-      setIsloading(false);
+      dispatch({
+        type: "rejected",
+        payload: "There was an error deleting the city...",
+      });
     }
   }
 
@@ -84,6 +147,7 @@ function CitiesProvider({ children }) {
         cities,
         isLoading,
         currentCity,
+        error,
         getCity,
         createCity,
         deleteCity,
