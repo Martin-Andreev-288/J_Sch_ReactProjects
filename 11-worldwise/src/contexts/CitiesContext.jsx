@@ -56,7 +56,23 @@ function CitiesProvider({ children }) {
       setCities((cities) => [...cities, data]);
       // taka gradovete trqbva da se dobavqt i v cities.json fayla, no i tova ne stava
     } catch {
-      alert("There was an error loading data...");
+      alert("There was an error creating city...");
+    } finally {
+      setIsloading(false);
+    }
+  }
+
+  async function deleteCity(id) {
+    try {
+      setIsloading(true);
+      await fetch(`${BASE_URL}/cities/${id}`, {
+        method: "DELETE",
+      });
+      // za da se update-nat gradovete (zashtoto inache shte vidim novodobaveniq chak sled kato prezaredim)
+      setCities((cities) => cities.filter((city) => city.id !== id));
+      // taka gradovete trqbva da se dobavqt i v cities.json fayla, no i tova ne stava
+    } catch {
+      alert("There was an error deleting city...");
     } finally {
       setIsloading(false);
     }
@@ -70,6 +86,7 @@ function CitiesProvider({ children }) {
         currentCity,
         getCity,
         createCity,
+        deleteCity,
       }}
     >
       {children}
