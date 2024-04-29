@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { useCities } from "../contexts/CitiesContext";
 import { useGeolocation } from "../hooks/useGeolocation";
 import Button from "./Button";
+import { useUrlPosition } from "../hooks/useUrlPosition";
 /* NavLink e deklarativen metod za prenasochvane, a useNavigate - imperativen!! */
 function Map() {
   const { cities } = useCities();
@@ -22,15 +23,13 @@ function Map() {
   /* izklyuchitelno zdravo obyrkvane stana tuk. Vyv versiqta na Jonas nqmashe nishto v skobite na
   useSearchParams i taka davashe greshka Cannot read properties of null (reading 'lat'). Vidqh tova ot
   sekciqta s vyprosi i otgovori i sled kato go slozhih - se poluchi.  */
-  const [searchParams] = useSearchParams({ lat: 40, lng: 0 });
   // dolu preimenuvame nqkoi ot neshtata, za da nqma obyrkvane
   const {
     isLoading: isLoadingPosition,
     position: geolocationPosition,
     getPosition,
   } = useGeolocation();
-  const mapLat = searchParams.get("lat");
-  const mapLng = searchParams.get("lng");
+  const [mapLat, mapLng] = useUrlPosition();
 
   /* Za da ne ni vryshta na predishniq grad, kato natisnem back buton, a da sme si v syshtiq:
   SAMO CHE PRI MEN ne se poluchava. Vizh po-kysno. Vizh ChangeCenter po-dolu.*/
