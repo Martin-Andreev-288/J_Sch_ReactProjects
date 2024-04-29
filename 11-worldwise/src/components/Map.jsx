@@ -11,10 +11,11 @@ import {
 import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
 import { useCities } from "../contexts/CitiesContext";
+import { useGeolocation } from "../hooks/useGeolocation";
+import Button from "./Button";
 /* NavLink e deklarativen metod za prenasochvane, a useNavigate - imperativen!! */
 function Map() {
   const { cities } = useCities();
-
   const [mapPosition, setMapPosition] = useState([40, 0]);
   // tezi chisla v useState-a za lat i lng
 
@@ -22,6 +23,12 @@ function Map() {
   useSearchParams i taka davashe greshka Cannot read properties of null (reading 'lat'). Vidqh tova ot
   sekciqta s vyprosi i otgovori i sled kato go slozhih - se poluchi.  */
   const [searchParams] = useSearchParams({ lat: 40, lng: 0 });
+  // dolu preimenuvame nqkoi ot neshtata, za da nqma obyrkvane
+  const {
+    isLoading: isLoadingPosition,
+    position: geolocationPosition,
+    getPosition,
+  } = useGeolocation();
   const mapLat = searchParams.get("lat");
   const mapLng = searchParams.get("lng");
 
@@ -34,8 +41,21 @@ function Map() {
     [mapLat, mapLng]
   );
 
+  useEffect(
+    function () {
+      if (geolocationPosition)
+        setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
+    },
+    [geolocationPosition]
+  );
+
   return (
     <div className={styles.mapContainer}>
+      {!geolocationPosition && (
+        <Button type="position" onClick={getPosition}>
+          {isLoadingPosition ? "Loading..." : "Use your position"}
+        </Button>
+      )}
       {/* i taka kydeto i da cyknem na map stranicata, shte ni zavede vyv form (t.e. shte ni otvori forma) */}
       <MapContainer
         center={mapPosition}
