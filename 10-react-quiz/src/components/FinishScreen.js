@@ -8,10 +8,6 @@ function FinishScreen({ points, maxPossiblePoints, highscore, dispatch }) {
   if (percentage >= 0 && percentage < 50) emoji = "🤔";
   if (percentage === 0) emoji = "🤦";
 
-  /* !!!!! Za da ne tr da sme otgovorili na vsichki vyprosi, za da mozhem da proverim, v Components -> hooks ->
-  reducer rychno smenqme status-a na "finished" i taka shte ni se renderira vse edno sme zavyrshili testa
-    pravim i taka, che da se zapazi highscore-a
-  */
   return (
     <>
       <p className="result">

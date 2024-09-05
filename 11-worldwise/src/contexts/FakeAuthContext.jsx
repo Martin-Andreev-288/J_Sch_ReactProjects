@@ -31,7 +31,6 @@ function AuthProvider({ children }) {
     initialState
   );
 
-  // tuk pri logina obiknoveno bihme imali API call, no sega prosto gi sravnqvame s fake user.
   function login(email, password) {
     if (email === FAKE_USER.email && password === FAKE_USER.password)
       dispatch({ type: "login", payload: FAKE_USER });

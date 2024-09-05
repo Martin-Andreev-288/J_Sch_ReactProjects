@@ -21,8 +21,6 @@ export default function Login() {
 
   useEffect(
     function () {
-      // kato dobavim { replace: true } i natisnem back strelkata v stranicata, v koqto sme vlezli vednaga
-      // sled kato sme se lognali - shte ni vyrne do nachalnata stranica. Bez tova ne ni dava.
       if (isAuthenticated) navigate("/app", { replace: true });
     },
     [isAuthenticated, navigate]

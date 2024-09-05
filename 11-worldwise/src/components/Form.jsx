@@ -20,7 +20,7 @@ export function convertToEmoji(countryCode) {
     .map((char) => 127397 + char.charCodeAt());
   return String.fromCodePoint(...codePoints);
 }
-// kopirame linka ot po-gore i mahame query-to nay-nakraq. Tqh gi dobavqme dolu i zamestvame kakvoto trqbva
+
 const BASE_URL = "https://api.bigdatacloud.net/data/reverse-geocode-client";
 
 function Form() {
@@ -39,7 +39,7 @@ function Form() {
   useEffect(
     function () {
       console.log(lat, lng);
-      if (lat && !lng) return; // kato nqma lat i lng, nqma smisyl da run-vame efekta.
+      if (lat && !lng) return;
 
       async function fetchCityData() {
         try {
@@ -50,7 +50,7 @@ function Form() {
             `${BASE_URL}?latitude=${lat}&longitude=${lng}`
           );
           const data = await res.json();
-          console.log(data); // kato cyknem na razlichni mesta na kartata, se poqvqvat razlichni latitude-i
+          console.log(data);
 
           if (!data.countryCode)
             throw new Error(
@@ -86,14 +86,11 @@ function Form() {
     };
 
     await createCity(newCity);
-    navigate("/app/cities"); // taka se vryshtame (avtomatichno) kym gradovete, sled kato dobavim nov grad
+    navigate("/app/cities");
   }
 
-  // Spinner-a, koyto pri men ne raboti
   if (isLoadingGeocoding) return <Spinner />;
 
-  // pri men tova NE SE poluchava, ne znam kak tochno da stigna do poziciq, v koqto da mi pokazva tova
-  // syobshtenie
   if (!lat && !lng)
     return <Message message="Start by clicking somewhere on the map" />;
 
@@ -116,11 +113,6 @@ function Form() {
 
       <div className={styles.row}>
         <label htmlFor="date">When did you go to {cityName}?</label>
-        {/* <input
-          id="date"
-          onChange={(e) => setDate(e.target.value)}
-          value={date}
-        /> */}
         <DatePicker
           onChange={(date) => setDate(date)}
           selected={date}
@@ -138,14 +130,6 @@ function Form() {
       </div>
 
       <div className={styles.buttons}>
-        {/* ponezhe ima 3 vida butona (s 3 razlichni klasa v Button.module.css), s type mozhem da vyvedem edno
-         ot 3-te imena. Tuk go pishem taka, posle se predava v Button.jsx i se izpolzva v className-a
-         Vizh razqsnenieto i tam, zashtoto ima vazhno prodylzhenie.
-         Inache tuk imame primer s 2 razlichni butona, koito se formatirat po 1 i syshti nachin (izpolzvani sa
-         2 razlichni klasa za 2-ta po interesen nachin).
-         Inache tuk butona se namira vyv formata, koeto znachi, che ako cyknem back, this will trigger the form
-         to be submitted. And so that will then cause the page to reload. I ZA TOVA tr da dobavim prevent
-         default. */}
         <Button type="primary">Add</Button>
         <BackButton />
       </div>

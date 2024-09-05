@@ -3,7 +3,6 @@ import { useReducer } from "react";
 const initialState = { count: 0, step: 1 };
 
 function reducer(state, action) {
-  // console.log(state, action);
 
   switch (action.type) {
     case "dec":
@@ -15,7 +14,7 @@ function reducer(state, action) {
     case "setStep":
       return { ...state, step: action.payload };
     case "reset":
-      return initialState; // tova e predimstvoto na useReducer. Inache v reset dolu trqbvashe da pishem 2 reda
+      return initialState;
     default:
       throw new Error("Unknown action");
   }
@@ -38,8 +37,6 @@ function DateCounter() {
   const date = new Date("june 21 2027");
   date.setDate(date.getDate() + count);
 
-  // V konkretno tezi sluchai payload-a e izlishen, mozhem napravo gore da napishem syotvetno + 1 i -1.
-  // V defineCount obache veche si e nuzhno
   const dec = function () {
     dispatch({ type: "dec" });
     // setCount((count) => count - 1);

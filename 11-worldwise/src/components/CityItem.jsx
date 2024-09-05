@@ -18,8 +18,6 @@ function CityItem({ city }) {
     deleteCity(id);
   }
 
-  // zaradi tiretata v klasa tr da izpolzvame [] za stila. Inache tova e za izbraniq grad (tozi, vyrhu koyto sme
-  // kliknali)
   return (
     <li>
       <Link

@@ -1,5 +1,3 @@
-// ne exportvame JSX, taka che tova si e js fayl
-
 import { useState } from "react";
 
 export function useGeolocation(defaultPosition = null) {

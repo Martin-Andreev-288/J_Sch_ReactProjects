@@ -4,8 +4,7 @@ import { createContext, useEffect } from "react";
 const BASE_URL = "http://localhost:9000";
 
 const CitiesContext = createContext();
-/* pravim state i za error (tova e edinstvenoto novo neshto), zashtoto po tozi nachin nqmashe kak da se razbere,
-ako ima greshka */
+
 const initialState = {
   cities: [],
   isLoading: false,
@@ -14,11 +13,6 @@ const initialState = {
 };
 
 function reducer(state, action) {
-  /* tuk e po-dobre da imenuvame case-ovete kato eventi, a ne kato setyri /t.e. naprimer dolu da e setCities/.
-  So it's usually a good idea to mode these actions as events and not as setters because this makes it easier
-  to see all the related state transitions.
-  A kato e cities/loaded - it makes it really easy to understand that this is related to the cities and then
-  that they have been loaded in this case. */
   switch (action.type) {
     case "loading":
       return { ...state, isLoading: true };
@@ -84,9 +78,7 @@ function CitiesProvider({ children }) {
   }, []);
 
   async function getCity(id) {
-    if (Number(id) === currentCity.id)
-      return; /* taka sega ako cyknem na edin grad i se vyrnem i sl tova
-    venaga pak go cyknem - shte se zaredi vednaga, bez kratkoto zabavqne */
+    if (Number(id) === currentCity.id) return;
 
     dispatch({ type: "loading" });
 

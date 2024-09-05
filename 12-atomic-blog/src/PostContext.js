@@ -1,5 +1,3 @@
-// celta e da rapnem vsichko, svyrzano s konteksta, i da go slozhim v tozi fayl
-
 import { createContext, useContext, useState } from "react";
 import { faker } from "@faker-js/faker";
 
@@ -23,10 +21,10 @@ function PostProvider({ children }) {
   const searchedPosts =
     searchQuery.length > 0
       ? posts.filter((post) =>
-          `${post.title} ${post.body}`
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())
-        )
+        `${post.title} ${post.body}`
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
+      )
       : posts;
 
   function handleAddPost(post) {
@@ -56,8 +54,8 @@ function PostProvider({ children }) {
 function usePosts() {
   const context = useContext(PostContext);
   if (context === undefined)
-    throw new Error("PostContext was used outside of the PostProvider"); // ako sluchayno ne izpolzvame
-  // PostContext-a kydeto trqbva, a naprimer predi JSX-a ili na drugo nepodhodqshto mqsto.
+    throw new Error("PostContext was used outside of the PostProvider");
+
   return context;
 }
 

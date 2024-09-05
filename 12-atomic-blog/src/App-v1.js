@@ -7,8 +7,7 @@ function createRandomPost() {
     body: faker.hacker.phrase(),
   };
 }
-/*
- */
+
 // 1) Create a context
 const PostContext = createContext();
 
@@ -23,10 +22,10 @@ function App() {
   const searchedPosts =
     searchQuery.length > 0
       ? posts.filter((post) =>
-          `${post.title} ${post.body}`
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())
-        )
+        `${post.title} ${post.body}`
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
+      )
       : posts;
 
   function handleAddPost(post) {
@@ -46,8 +45,7 @@ function App() {
   );
 
   return (
-    // 2) Provide value to child components (searchquery i setSearchQuery mozhem da gi napishem taka, zashtoto
-    // imat ednakvi klyuchove i stoynosti (ne sym sig dali se narichat klyuchove i st-ti, no sa ednakvi))
+    // 2) Provide value to child components
     <PostContext.Provider
       value={{
         posts: searchedPosts,
@@ -75,10 +73,6 @@ function App() {
 }
 
 function Header() {
-  // ponezhe onClearPosts se polzva v butona dolu, shte tr da izpolzvame useContext tuk
-  /* ako napishem const x = useContext(PostContext); i go console log-nem, shte vidim, che printi
-  obekt ot vsichki neshta vyv value-to na Post-Context-a, t.e. tochno kakto sme gi napisali vyv value. Zatova
-  mozhem da izpolzvame destrukturirane */
   // 3) consuming context value
   const { onClearPosts } = useContext(PostContext);
 

@@ -5,8 +5,7 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* Pravim taka, che da mozhem da zatvarqme filma i s escape. Za tazi cel se nalozhi da izlezem ot reakt i da
-se vyrnem kym DOM (t.e. s addEventListener) */
+
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
@@ -52,14 +51,11 @@ export default function App() {
   useEffect(
     function () {
       const controller = new AbortController();
-      /* abortcontroller-a e browser API, nqma obshto s reakt, ami s browser-a. Toy e za da napravim taka, che
-      da nqma tvyrde mnogo zaqvki */
 
       async function fetchMovies() {
         try {
           setIsLoading(true);
-          setError(""); // tr da resetnem error state-a. Sled kato dolu se poluchi greshka, ako ne go resetnem
-          // tuk, nqma da se poluchi otnovo
+          setError("");
           const res = await fetch(
             `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
             { signal: controller.signal }
@@ -76,7 +72,6 @@ export default function App() {
           setMovies(data.Search);
           setError("");
         } catch (err) {
-          // tova e, za da ne se izpisva edno neshto, koeto ne e greshka, kato greshka zaradi abortcontroller-a
           if (err.name !== "AbortError") {
             console.log(err.message);
             setError(err.message);
@@ -85,17 +80,16 @@ export default function App() {
           setIsLoading(false);
         }
       }
-      // taka veche ne pokazva nishto, ako nqma pone 3 vyvedeni bukvi v searchbar-a
+
       if (query.length < 3) {
         setMovies([]);
         setError("");
         return;
       }
 
-      // tova e za da se zatvori filma, ako zapochnem da vyvezhdame zaglavieto na drug.
       handleCloseMovie();
       fetchMovies();
-      // TOVA DOLU E CLEANUP FUNKCIQ
+
       return function () {
         controller.abort();
       };
@@ -218,8 +212,6 @@ function MovieList({ movies, onSelectMovie }) {
 }
 
 function Movie({ movie, onSelectMovie }) {
-  // vsqko movie ima key imdbID property v obekta. Ako printnem movie v konzolata, shte vidim. Ot tam vzimame
-  // tova movie.imdbID
   return (
     <li onClick={() => onSelectMovie(movie.imdbID)}>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
@@ -235,24 +227,15 @@ function Movie({ movie, onSelectMovie }) {
 }
 
 function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
-  // kopirame fetch-a otgore i podmenqme chast ot linka. GLEDAME v sayta!!! obdbapi.com. Ot tam se orientirame
-  // che tr da ima i sled KEY i predi selectedId. Ima edin ogromen paragraf Parameters.
-
-  // tuk ponezhe filmite sa v obekt, nachalniq state shte e obekt (ako napishem const data = await res.json();
-  // i sled tova console.log(data) i getMovieDetails() (vizh v screenshot-a kyde tochno) - shte vidim)
   const [movie, setMovie] = useState({});
-  // za da imame loading indikator, dokato se zarezhda izbraniq film (za razlika ot predniq pyt, tuk ne
-  // napisahme tova za greshka s interneta i t.n.):
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
-  // tova dolnoto e da se poqvqva rating-a na user-a, ako e glasuval
   const watchedUserRating = watched.find(
     (movie) => movie.imdbID === selectedId
   )?.userRating;
 
-  // destrukturirame ot tozi obekt, ponezhe jonas ne haresva key-ovete da zapochvat s glavna bukva:
   const {
     Title: title,
     Year: year,
@@ -281,13 +264,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onCloseMovie();
   }
 
-  /* tozi dolen useEffect tr da e tuk, zashtoto ako e s gornite, shte ni izpisva "CLOSING" v konzolata dori i
-  veche da sme zatvorili filma i da ne sme v nego
-  !!! Each time that this effect here is executed, it'll basically add one more event listener to the document.
-  And so if we open up 10 movies and then close them all, we will end up with 10 of the same event listeners
-  attached to the document which of course, is not what we want. Po tazi prichina nay-dolu dobavqne cleanup
-  funkciq (callback)
-   */
   useEffect(
     function () {
       function callback(e) {
@@ -299,7 +275,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
       document.addEventListener("keydown", callback);
 
-      // callback funkciq
       return function () {
         document.removeEventListener("keydown", callback);
       };
@@ -307,11 +282,8 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     [onCloseMovie]
   );
 
-  console.log(title, year); // purvonachalno printi undefined undefined, sled tova veche si printi zaglavieto
-  // i godinata. Tova e zaradi procesa s await/useEffect () - pyrvonachalno e prazen obekt gore, posle
-  // setMovie(data); go pylni. Vyv videoto e nqkyde sled 5-tata minuta
-  // ako NQMA selectedId dolu v dependency array-a, nqma da se smenq izbraniq film (shte si stoi syshtiq)
-  // hubavo obqsnenie za tova nqkyde sled 12-tata minuta
+  console.log(title, year);
+
   useEffect(
     function () {
       async function getMovieDetails() {
@@ -331,12 +303,8 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   useEffect(
     function () {
       if (!title) return;
-      // tova if e za da ne izpisva undefined v nachaloto, kakto se poluchava bez nego syvsem zamalko
       document.title = `Movie | ${title}`;
 
-      // tova dolu e cleanup funkciq. Tq raboti na principa na closure-a. Kogato zatvorim filma, shte se
-      // izpishe console log-a dolu, zashtoto tq pomni. Po tozi nachin veche zaglavieto izghezva, kato zatvorim
-      // fila.
       return function () {
         document.title = "usePopcorn";
         console.log(`Clean up effect for movie ${title}`);
@@ -345,7 +313,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     [title]
   );
 
-  // tova &larr; dolu e strelka nalqvo. S neq vryshtame nazad v sluchaq (ili zatvarqme otvoreniq film)
   return (
     <div className="details">
       {isLoading ? (

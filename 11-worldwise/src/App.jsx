@@ -14,17 +14,6 @@ import { CitiesProvider } from "./contexts/CitiesContext";
 import { AuthProvider } from "./contexts/FakeAuthContext";
 import ProtectedRoute from "./pages/ProtectedRoute";
 
-/* po tozi nachin samo se "svyrzvame" s komponentite, ne pasvame nikakvi propsove. Tova e predimstvoto na
-konteksta
-And so now if we want to jump into this application if we have never seen it before and open up this component
-then it's really easy to understand what it does. So there's no clutter here. All it has is the route
-definition. And if we then want to know about the state, we can just go to the CitiesProvider and see how it
-all works. So where the data actually comes from.
-*/
-
-/* Za authentication-a - nqma nuzhda da wrap-vame absoliutno vsichko, dostatychno e samo AppLayout. Mozhe da
-chuesh okolo 5-tata minuta obqsnenieto za tova. */
-
 function App() {
   return (
     <AuthProvider>

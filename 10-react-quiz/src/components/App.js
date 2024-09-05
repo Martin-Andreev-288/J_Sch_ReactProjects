@@ -10,17 +10,12 @@ import Progress from "./Progress";
 import FinishScreen from "./FinishScreen";
 import Timer from "./Timer";
 import Footer from "./Footer";
-/* !!!!!!!!!!!!!!!Tuk prilozhenieto/vsichki komponenti rerendyrvat vsqka sekunda, koeto v po-golqmo prilozhenie
- bi bilo problem i ppc ne tr da e taka (glavniq komponent da rerendyrva vsqka sekunda). No tuk ne e problem */
 
-// ne e ok da imame "magic" numbers, t.e. napravo dolu da pishem 30. Po-dobre da napravim konstanta i taka
-// inache Jonas vyv videoto e napisal 30 sekundi na vypros, no realno sa 20, makar i da ne se vizhda 20, a 30
 const SECS_PER_QUESTION = 20;
 
 const initialState = {
   questions: [],
-  status: "loading", // tozi pyt vmesto s isLoading, go pravim taka. Prilozhenieto ppc ima nqkolko statusa:
-  // 'loading', 'error', 'ready', 'active', 'finished'
+  status: "loading",
   index: 0,
   answer: null,
   points: 0,
@@ -34,8 +29,7 @@ function reducer(state, action) {
       return {
         ...state,
         questions: action.payload,
-        status: "ready", // tova e i strahotnoto na useReducer, tuk sega mozhem da dobavim i status
-        // questions i status chesto shte se smenqt zaedno, zatova i useReducer e tolkova polezen
+        status: "ready",
       };
     case "dataFailed":
       return {
@@ -60,7 +54,6 @@ function reducer(state, action) {
             : state.points,
       };
     case "nextQuestion":
-      // dobavqme answer: null, za da ne sa i sledvashtite vyprosi ocveteni taka, vse edno sme otgovorili
       return { ...state, index: state.index + 1, answer: null };
     case "finish":
       return {
@@ -72,7 +65,7 @@ function reducer(state, action) {
     case "restart":
       // the questions remain the same, but everything else is reset
       return { ...initialState, questions: state.questions, status: "ready" };
-    // 2-ri nachin (Jonas predpochita pyrviq):
+    // Another way:
     // return {
     //   ...state,
     //   points: 0,
@@ -86,7 +79,6 @@ function reducer(state, action) {
       return {
         ...state,
         secondsRemaining: state.secondsRemaining - 1,
-        // da priklyuchi quiz-a, kogato ostavashtite sekundi sa veche 0:
         status: state.secondsRemaining === 0 ? "finished" : state.status,
       };
 
@@ -96,8 +88,7 @@ function reducer(state, action) {
 }
 
 export default function App() {
-  // ako dolu conditionally display-nem komponentite (v Main), shte e mnogo rabota, zatova po-dobre da
-  // destrukturirame state obekta
+
   const [
     { questions, status, index, answer, points, highscore, secondsRemaining },
     dispatch,
@@ -112,10 +103,8 @@ export default function App() {
   useEffect(function () {
     fetch("http://localhost:9000/questions")
       .then((res) => res.json())
-      .then((data) => dispatch({ type: "dataReceived", payload: data })) // tuk pasvame aktualnata data
-      .catch((err) => dispatch({ type: "dataFailed" })); // tuk nqma nuzhda ot payload, ne se interesuvame ot
-    // greshkata, ne ni trqbva. Dostatychno e da kazhen na state-a, che sega status-a e error. I sega ako sprem
-    // syrvyra i vlezem v components i shte vidim, che status-a na hookovete shte e er
+      .then((data) => dispatch({ type: "dataReceived", payload: data }))
+      .catch((err) => dispatch({ type: "dataFailed" }));
   }, []);
 
   return (
@@ -165,5 +154,3 @@ export default function App() {
     </div>
   );
 }
-// i sega ako prezaredim, kato v network promenim na ot no throttling na slow, shte vidim za prezarezhdane
-// kakvo izpisva

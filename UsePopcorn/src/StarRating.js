@@ -11,12 +11,6 @@ const starContainerSyle = {
   display: "flex",
 };
 
-// ppc Jonas ne polzva typescript, zashtoto v dneshno vreme developer-ite ne go praveli.
-// no ako neshta ot tozi sort sa ni vazhni, mozhem da izpolzvame typescript.
-// inache sega ako podadem neshto razlichno ot chislo za maxRating, shte ni izskochi greshka
-// ako napishem .isRequired, prop-a shte e zadylzhitelen. No tuk nqma smisyl: in our case we actually have
-// some default values for all of our props already defined. And so it doesn't mmake sense then to mark any
-// of them as required.
 StarRating.propTypes = {
   maxRating: PropTypes.number,
   defaultRating: PropTypes.number,
@@ -26,7 +20,7 @@ StarRating.propTypes = {
   className: PropTypes.string,
   onSetRating: PropTypes.func,
 };
-// imame i .bool za boolean i .obj za obekt
+
 export default function StarRating({
   maxRating = 5,
   color = "#fcc419",

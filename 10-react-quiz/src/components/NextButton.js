@@ -1,6 +1,6 @@
 function NextButton({ dispatch, answer, index, numQuestions }) {
   if (answer === null) return null;
-  // za da nqma next buton, sled kato minem posledniq vypros
+
   if (index < numQuestions - 1)
     return (
       <button
@@ -10,7 +10,7 @@ function NextButton({ dispatch, answer, index, numQuestions }) {
         Next
       </button>
     );
-  // kogato sme veche na posledniq vypros:
+
   if (index === numQuestions - 1)
     return (
       <button

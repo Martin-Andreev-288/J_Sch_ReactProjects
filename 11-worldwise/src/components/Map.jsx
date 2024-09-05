@@ -14,16 +14,11 @@ import { useCities } from "../contexts/CitiesContext";
 import { useGeolocation } from "../hooks/useGeolocation";
 import Button from "./Button";
 import { useUrlPosition } from "../hooks/useUrlPosition";
-/* NavLink e deklarativen metod za prenasochvane, a useNavigate - imperativen!! */
+
 function Map() {
   const { cities } = useCities();
   const [mapPosition, setMapPosition] = useState([40, 0]);
-  // tezi chisla v useState-a za lat i lng
 
-  /* izklyuchitelno zdravo obyrkvane stana tuk. Vyv versiqta na Jonas nqmashe nishto v skobite na
-  useSearchParams i taka davashe greshka Cannot read properties of null (reading 'lat'). Vidqh tova ot
-  sekciqta s vyprosi i otgovori i sled kato go slozhih - se poluchi.  */
-  // dolu preimenuvame nqkoi ot neshtata, za da nqma obyrkvane
   const {
     isLoading: isLoadingPosition,
     position: geolocationPosition,
@@ -31,8 +26,6 @@ function Map() {
   } = useGeolocation();
   const [mapLat, mapLng] = useUrlPosition();
 
-  /* Za da ne ni vryshta na predishniq grad, kato natisnem back buton, a da sme si v syshtiq:
-  SAMO CHE PRI MEN ne se poluchava. Vizh po-kysno. Vizh ChangeCenter po-dolu.*/
   useEffect(
     function () {
       if (mapLat && mapLng) setMapPosition([mapLat, mapLng]);
@@ -55,7 +48,6 @@ function Map() {
           {isLoadingPosition ? "Loading..." : "Use your position"}
         </Button>
       )}
-      {/* i taka kydeto i da cyknem na map stranicata, shte ni zavede vyv form (t.e. shte ni otvori forma) */}
       <MapContainer
         center={mapPosition}
         zoom={6}
@@ -84,25 +76,18 @@ function Map() {
   );
 }
 
-/* Za da ni zavede do pravilniq grad na kartata, kato go izberem, zashtoto inache si stoim na edno mqsto,
-syzdavame komponent, koyto po-dobre da e tuk, ne v otdelen fayl, i go slagame sled tova i gore:
-Izpolzvame hook ot react-leaflet */
 function ChangeCenter({ position }) {
   const map = useMap();
   map.setView(position);
   return null;
 }
 
-// tova e za da ni otvori forma vlqvo, kato cyknem nqkyde na kartata vdqsno. Izpolzvame hook ot react-leaflet
 function DetectClick() {
   const navigate = useNavigate();
 
   useMapEvents({
     click: (e) => {
-      // console.log(e); // tova idva ot leaflet library. Edno ot propyrtitata (vizhda se, kato cyknem nqkyde na
-      // // kartata), e: LatLng {lat: 38.103673700636776, lng: -1.77978515625}. Taka sega go dobavqme dolu:
       navigate(`form?lat=${e.latlng.lat}&lng=${e.latlng.lng}`);
-      // i sega kato cyknem, lat-a i lng-a se dobavqt v URL-a
     },
   });
 }

@@ -8,16 +8,11 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const KEY = "95b5ad09";
-/* pravim useKey, za da raboti escape butona, t.e. da mozhem da zatvarqme movie i s nego
-pravim taka i che kato natisnem enter, da se aktivira tyrsachkata */
+
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
 
-  // tezi neshta za vyrnati ot drugiq fayl. Kogato gi napishem tuk taka, pak zapochva da si raboti po syshtiq
-  // nachin, kakto i predi da napravim tova. SAMO f-qta za zatvarqne na filma ne raboteshe.
-  // Zatova dobavihme handleCloseMovie i napisahme callback?.(); v drugiq fayl. Taka se poluchava hoisting i
-  // veche pak si raboti i tq.
   const { movies, isLoading, error } = useMovies(query);
 
   const [watched, setWatched] = useLocalStorageState([], "watched");
@@ -109,19 +104,10 @@ function Search({ query, setQuery }) {
   const inputEl = useRef(null);
 
   useKey("Enter", function () {
-    // tova e za da ne se trie vyvedenoto, ako pak natisnem enter, dokato tyrsachkata e aktivna
-    // t.e. kazvame mu prosto "ne pravi nishto"
     if (document.activeElement === inputEl.current) return;
     inputEl.current.focus();
     setQuery("");
   });
-
-  // nepravilniqt nachin da izberem DOM element v reakt
-  // useEffect(function () {
-  //   const el = document.querySelector(".search");
-  //   console.log(el);
-  //   el.focus();
-  // }, []);
 
   return (
     <input
@@ -171,8 +157,6 @@ function MovieList({ movies, onSelectMovie }) {
 }
 
 function Movie({ movie, onSelectMovie }) {
-  // vsqko movie ima key imdbID property v obekta. Ako printnem movie v konzolata, shte vidim. Ot tam vzimame
-  // tova movie.imdbID
   return (
     <li onClick={() => onSelectMovie(movie.imdbID)}>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
@@ -188,43 +172,24 @@ function Movie({ movie, onSelectMovie }) {
 }
 
 function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
-  // kopirame fetch-a otgore i podmenqme chast ot linka. GLEDAME v sayta!!! obdbapi.com. Ot tam se orientirame
-  // che tr da ima i sled KEY i predi selectedId. Ima edin ogromen paragraf Parameters.
-
-  // tuk ponezhe filmite sa v obekt, nachalniq state shte e obekt (ako napishem const data = await res.json();
-  // i sled tova console.log(data) i getMovieDetails() (vizh v screenshot-a kyde tochno) - shte vidim)
   const [movie, setMovie] = useState({});
-  // za da imame loading indikator, dokato se zarezhda izbraniq film (za razlika ot predniq pyt, tuk ne
-  // napisahme tova za greshka s interneta i t.n.):
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
-  // So we created this ref here where we want to store the amount of clicks that happened on the rating
-  // before the movie is added but we don't want to render that information onto the user interface. Or in
-  // other words, we do not want to create a re-render.
   const countRef = useRef(0);
-  // we are not allowed to mutate the ref in render logic, so we must use useEffect.
 
   useEffect(
     function () {
       if (userRating) countRef.current++;
-      // so with a ref, we don't have a set function but instead we simply mutate the current property which is
-      // in the ref. And so that's why we say that a ref is basically like a box that can hold any value.
-      // ako go napravim s obiknovena promenliva (primerno let count = 0; vmesto const countRef = useRef(0)),
-      // nqma da raboti, zashtoto tq shte se reset-va sled vsqko rerend-yrvane i vinagi shte se vryshta na 0
-      // i nakraq rezultatyt na klikaniqta shte si e 1 sled poslednoto klikane, kogato count-yt se dobavq v
-      // obekta.
     },
     [userRating]
   );
 
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
-  // tova dolnoto e da se poqvqva rating-a na user-a, ako e glasuval
   const watchedUserRating = watched.find(
     (movie) => movie.imdbID === selectedId
   )?.userRating;
 
-  // destrukturirame ot tozi obekt, ponezhe jonas ne haresva key-ovete da zapochvat s glavna bukva:
   const {
     Title: title,
     Year: year,
@@ -254,21 +219,10 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onCloseMovie();
   }
 
-  /* tozi dolen useEffect tr da e tuk, zashtoto ako e s gornite, shte ni izpisva "CLOSING" v konzolata dori i
-  veche da sme zatvorili filma i da ne sme v nego
-  !!! Each time that this effect here is executed, it'll basically add one more event listener to the document.
-  And so if we open up 10 movies and then close them all, we will end up with 10 of the same event listeners
-  attached to the document which of course, is not what we want. Po tazi prichina nay-dolu dobavqne cleanup
-  funkciq (callback)
-   */
-
   useKey("Escape", onCloseMovie);
 
-  console.log(title, year); // purvonachalno printi undefined undefined, sled tova veche si printi zaglavieto
-  // i godinata. Tova e zaradi procesa s await/useEffect () - pyrvonachalno e prazen obekt gore, posle
-  // setMovie(data); go pylni. Vyv videoto e nqkyde sled 5-tata minuta
-  // ako NQMA selectedId dolu v dependency array-a, nqma da se smenq izbraniq film (shte si stoi syshtiq)
-  // hubavo obqsnenie za tova nqkyde sled 12-tata minuta
+  console.log(title, year);
+
   useEffect(
     function () {
       async function getMovieDetails() {
@@ -288,12 +242,9 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   useEffect(
     function () {
       if (!title) return;
-      // tova if e za da ne izpisva undefined v nachaloto, kakto se poluchava bez nego syvsem zamalko
+
       document.title = `Movie | ${title}`;
 
-      // tova dolu e cleanup funkciq. Tq raboti na principa na closure-a. Kogato zatvorim filma, shte se
-      // izpishe console log-a dolu, zashtoto tq pomni. Po tozi nachin veche zaglavieto izghezva, kato zatvorim
-      // fila.
       return function () {
         document.title = "usePopcorn";
         console.log(`Clean up effect for movie ${title}`);
@@ -302,7 +253,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     [title]
   );
 
-  // tova &larr; dolu e strelka nalqvo. S neq vryshtame nazad v sluchaq (ili zatvarqme otvoreniq film)
   return (
     <div className="details">
       {isLoading ? (
