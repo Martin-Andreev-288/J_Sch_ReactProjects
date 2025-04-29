@@ -15,4 +15,4 @@ Throughout these projects, I practiced React with its some of its core concepts 
  - Run npm start;
 
 ## Original Course
-These projects are based on the course by John Smilga: [The Ultimate React Course 2024: React, Next.js, Redux & More](https://www.udemy.com/course/the-ultimate-react-course/).
+These projects are based on the [Ultimate React Course](https://www.udemy.com/course/the-ultimate-react-course/) by Jonas Schmedtmann.
